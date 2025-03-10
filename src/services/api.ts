@@ -29,4 +29,13 @@ export const authApi = {
   },
 };
 
+export const uploadApi = {
+  uploadAvatar: (formData: FormData) =>
+    api.post('/uploadAvatar', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }),
+};
+
 export default api;

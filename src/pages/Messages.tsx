@@ -6,12 +6,15 @@ import Cookies from 'js-cookie';
 import Breadcrumb from '../components/Breadcrumbs/Breadcrumb';
 import DefaultLayout from '../layout/DefaultLayout';
 import useColorMode from '../hooks/useColorMode';
+import UserDefault from '../images/user/default.png';
+import { UserRole } from '../types';
 
 interface User {
   _id: string;
   username: string;
   email: string;
   role: string;
+  avatar: string;
   lastMessage?: {
     content: string;
     createdAt: string;
@@ -86,7 +89,7 @@ const Messages: React.FC = () => {
   // Initialize Socket.IO connection
   useEffect(() => {
     // Connect to Socket.IO server
-    socketRef.current = io('', {
+    socketRef.current = io(import.meta.env.VITE_BACKEND_URL, {
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
@@ -95,40 +98,29 @@ const Messages: React.FC = () => {
     // Authenticate with token
     const token = Cookies.get('token');
     if (token) {
-      console.log('Authenticating socket with token');
       socketRef.current.emit('authenticate', token);
     }
 
     // Handle authentication success
-    socketRef.current.on('authenticated', () => {
-      console.log('Socket authenticated successfully');
-    });
+    socketRef.current.on('authenticated', () => {});
 
     // Handle authentication error
-    socketRef.current.on('auth_error', (error) => {
-      console.error('Socket authentication error:', error);
-    });
+    socketRef.current.on('auth_error', () => {});
 
     // Handle connection events
     socketRef.current.on('connect', () => {
-      console.log('Socket connected');
       // Re-authenticate on reconnection
       if (token) {
         socketRef.current?.emit('authenticate', token);
       }
     });
 
-    socketRef.current.on('disconnect', () => {
-      console.log('Socket disconnected');
-    });
+    socketRef.current.on('disconnect', () => {});
 
-    socketRef.current.on('connect_error', (error) => {
-      console.error('Socket connection error:', error);
-    });
+    socketRef.current.on('connect_error', () => {});
 
     // Listen for new messages
     socketRef.current.on('new_message', (message: Message) => {
-      console.log('New message received:', message);
       const otherUser = user?.role === 'coach' ? selectedParent : coach;
 
       if (
@@ -138,7 +130,6 @@ const Messages: React.FC = () => {
           (message.sender._id === user?._id &&
             message.receiver._id === otherUser._id))
       ) {
-        console.log('Adding message to chat');
         setMessages((prevMessages) => [...prevMessages, message]);
       }
 
@@ -162,13 +153,10 @@ const Messages: React.FC = () => {
     });
 
     // Handle message errors
-    socketRef.current.on('message_error', (error) => {
-      console.error('Message sending error:', error);
-    });
+    socketRef.current.on('message_error', () => {});
 
     // Cleanup on unmount
     return () => {
-      console.log('Cleaning up socket connection');
       if (socketRef.current) {
         socketRef.current.disconnect();
       }
@@ -283,14 +271,28 @@ const Messages: React.FC = () => {
                           : ''
                       }`}
                     >
-                      <div className="w-full">
+                      <div className="relative mr-3.5 min-h-11 min-w-11 max-w-11">
+                        <img
+                          src={parent.avatar || UserDefault}
+                          alt="profile"
+                          className="h-full w-full rounded-full object-cover object-center"
+                        />
+                        {/* <span className="absolute bottom-0 right-0 block h-3 w-3 rounded-full border-2 border-gray-2 bg-success"></span> */}
+                      </div>
+                      <div className="w-full overflow-hidden">
                         <h5 className="text-sm font-medium text-black dark:text-white">
                           {parent.username}
                         </h5>
-                        <p className="text-gray-6 dark:text-gray-4 truncate text-sm">
-                          {parent.lastMessage
-                            ? parent.lastMessage.content
-                            : 'メッセージはありません。'}
+                        <p className="text-gray-6 dark:text-gray-4 truncate text-ellipsis text-sm">
+                          {parent.lastMessage ? (
+                            parent.lastMessage.content
+                          ) : (
+                            <span>
+                              メッセージは
+                              <br />
+                              ありません。
+                            </span>
+                          )}
                         </p>
                         {parent.lastMessage && (
                           <p className="text-gray-5 dark:text-gray-5 mt-1 text-xs">
@@ -345,9 +347,21 @@ const Messages: React.FC = () => {
                   </button>
                 )}
                 <div className="flex items-center">
+                  <div className="relative mr-3.5 h-11 w-full max-w-11">
+                    <img
+                      src={
+                        user?.role === UserRole.COACH
+                          ? selectedParent?.avatar || UserDefault
+                          : coach?.avatar || UserDefault
+                      }
+                      alt="profile"
+                      className="h-full w-full rounded-full object-cover object-center"
+                    />
+                    {/* <span className="absolute bottom-0 right-0 block h-3 w-3 rounded-full border-2 border-gray-2 bg-success"></span> */}
+                  </div>
                   <div>
                     <h5 className="font-medium text-black dark:text-white">
-                      {user?.role === 'coach'
+                      {user?.role === UserRole.COACH
                         ? selectedParent?.username
                         : coach?.username}
                     </h5>

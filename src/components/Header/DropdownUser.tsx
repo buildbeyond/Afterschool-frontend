@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 
-import UserOne from '../../images/user/user-01.png';
+import UserDefault from '../../images/user/default.png';
+import { UserRole } from '../../types';
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -50,10 +51,17 @@ const DropdownUser = () => {
           <span className="block text-sm font-medium text-black dark:text-white">
             {user.username}
           </span>
+          <span className="block text-xs">
+            {user.role === UserRole.PARENT ? '保護者' : 'コーチ'}
+          </span>
         </span>
 
         <span className="h-12 w-12 overflow-hidden">
-          <img src={UserOne} className=" rounded-full" alt="User" />
+          <img
+            src={user.avatar || UserDefault}
+            className=" rounded-full"
+            alt="User"
+          />
         </span>
 
         <svg
@@ -83,7 +91,7 @@ const DropdownUser = () => {
         }`}
       >
         <ul className="flex flex-col gap-5 border-b border-stroke px-6 py-7.5 dark:border-strokedark">
-          {/* <li>
+          <li>
             <Link
               to="/profile"
               className="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
@@ -107,7 +115,7 @@ const DropdownUser = () => {
               </svg>
               プロフィール
             </Link>
-          </li> */}
+          </li>
           <li>
             <Link
               to="/messages"

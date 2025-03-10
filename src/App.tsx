@@ -16,6 +16,7 @@ import ScheduleStats from './pages/Schedule/ScheduleStatistics';
 import SignIn from './pages/Authentication/SignIn';
 import SignUp from './pages/Authentication/SignUp';
 import Unauthorized from './pages/Authentication/Unauthorized';
+import Profile from './pages/Profile';
 
 function AppContent() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -117,6 +118,15 @@ function AppContent() {
           <ProtectedRoute>
             <PageTitle title="Messages" />
             <Messages />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <PageTitle title="Profile" />
+            <Profile />
           </ProtectedRoute>
         }
       />
