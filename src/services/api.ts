@@ -3,7 +3,7 @@ import Cookies from 'js-cookie';
 import { ILoginInput, IRegisterInput } from '../types';
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: `${process.env.BACKEND_URL}/api`,
   headers: {
     'Content-Type': 'application/json',
   },
