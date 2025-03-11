@@ -2,7 +2,7 @@ import React from 'react';
 
 interface ScheduleTableProps {
   scheduleData: ScheduleEntry[];
-  onScheduleChange: (newSchedule: ScheduleEntry[]) => void;
+  onChange: (newSchedule: ScheduleEntry[]) => void;
 }
 
 interface ScheduleEntry {
@@ -15,17 +15,18 @@ interface ScheduleEntry {
   plannedPickupLocation: LocationType;
   plannedReturn: boolean;
   plannedReturnLocation: LocationType;
-  isAbsent: boolean;
+  beAbsent: boolean;
   lunch: boolean;
   dinner: boolean;
   notes?: string;
+  additionalUse: boolean;
 }
 
 type LocationType = '学校' | '自宅' | 'その他';
 
 const ScheduleTable: React.FC<ScheduleTableProps> = ({
   scheduleData,
-  onScheduleChange,
+  onChange,
 }) => {
   const handleInputChange = (
     index: number,
@@ -37,7 +38,7 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
       ...newScheduleData[index],
       [field]: value,
     };
-    onScheduleChange(newScheduleData);
+    onChange(newScheduleData);
   };
   const handleTimeChange = (
     index: number,
@@ -74,6 +75,12 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
                   <span className="text-sm font-medium">復</span>
                 </div>
               </div>
+            </th>
+
+            <th className="p-2.5 text-center text-sm font-medium">
+              追加利用
+              <br />
+              希望
             </th>
             <th className="p-2.5 text-center text-sm font-medium">昼食</th>
             <th className="border-r border-stroke p-2.5 text-center text-sm font-medium dark:border-strokedark">
@@ -196,6 +203,16 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
                     </select>
                   </div>
                 </div>
+              </td>
+              <td className="p-2.5 text-center">
+                <input
+                  type="checkbox"
+                  checked={entry.additionalUse}
+                  onChange={(e) =>
+                    handleInputChange(index, 'additionalUse', e.target.checked)
+                  }
+                  className="h-4 w-4"
+                />
               </td>
               <td className="p-2.5 text-center">
                 <input

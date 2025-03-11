@@ -1,6 +1,7 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { ILoginInput, IRegisterInput } from '../types';
+import { ILoginInput, IRegisterInput, ParentScheduleData } from '../types';
+import { ScheduleEntry } from '../pages/Tables/ScheduleTable';
 
 const api = axios.create({
   baseURL: `${import.meta.env.VITE_BACKEND_URL}/api`,
@@ -36,6 +37,67 @@ export const uploadApi = {
         'Content-Type': 'multipart/form-data',
       },
     }),
+};
+
+export interface ScheduleData {
+  month: string;
+  year: string;
+  entries: ScheduleEntry[];
+}
+
+export const scheduleApi = {
+  submitSchedule: async (scheduleData: ScheduleData) => {
+    const response = await api.post(`/schedule`, scheduleData);
+    return response.data;
+  },
+
+  getSchedule: async (month: string, year: string) => {
+    const response = await api.get(`/schedule?month=${month}&year=${year}`);
+    return response.data;
+  },
+
+  getScheduleStats: async (month: string, day: string, year: string) => {
+    const response = await api.get(
+      `/schedule/stats?month=${month}&day=${day}&year=${year}`
+    );
+    return response.data;
+  },
+
+  submitScheduleStats: async (
+    month: string,
+    day: string,
+    year: string,
+    scheduleData: ParentScheduleData[]
+  ) => {
+    const response = await api.post(`/schedule/stats`, {
+      month,
+      day,
+      year,
+      scheduleUpdates: scheduleData,
+    });
+    return response.data;
+  },
+
+  updateScheduleStats: async (
+    month: string,
+    year: string,
+    day: string,
+    scheduleUpdates: any[]
+  ) => {
+    const token = localStorage.getItem('token');
+    const response = await axios.post(
+      `${
+        import.meta.env.VITE_BACKEND_URL
+      }/api/schedule/stats?month=${month}&year=${year}&day=${day}`,
+      { scheduleUpdates },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  },
 };
 
 export default api;

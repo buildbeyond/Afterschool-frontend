@@ -1,236 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DefaultLayout from '../../layout/DefaultLayout';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
 import DatePickerJp from '../../components/Forms/DatePicker/DatePickerJp';
-
-import kid from '../../images/user/kid.png';
-
-interface ParentScheduleEntry {
-  id: string;
-  name: string;
-  avatar?: string;
-  reason?: string;
-  isAbsent?: boolean;
-  hadSnack?: boolean;
-  isNight?: boolean;
-  className?: string;
-  plannedStart: string;
-  plannedEnd: string;
-  actualStart: string;
-  actualEnd: string;
-  plannedPickup: boolean;
-  plannedReturn: boolean;
-  actualPickup: boolean;
-  actualReturn: boolean;
-  notes?: string;
-  lunch: boolean;
-  dinner: boolean;
-  plannedPickupLocation?: string;
-  plannedReturnLocation?: string;
-}
-
-interface ParentScheduleData {
-  date: string;
-  entries: ParentScheduleEntry[];
-}
+import { scheduleApi } from '../../services/api';
+import { toast } from 'react-toastify';
+import { ParentScheduleData, ParentScheduleEntry } from '../../types';
 
 const ScheduleStats: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [scheduleData, setScheduleData] = useState<ParentScheduleEntry[]>([
-    {
-      id: '1',
-      name: '中村 絵衣子',
-      avatar: kid,
-      className: '年長クラス',
-      plannedStart: '16:00',
-      plannedEnd: '17:30',
-      actualStart: '16:05',
-      actualEnd: '17:25',
-      plannedPickup: true,
-      plannedReturn: true,
-      actualPickup: true,
-      actualReturn: true,
-      notes: '元気に過ごしました',
-      lunch: true,
-      dinner: true,
-      plannedPickupLocation: '学校',
-      plannedReturnLocation: '学校',
-    },
-    {
-      id: '2',
-      name: '佐藤 太郎',
-      avatar: kid,
-      className: '年中クラス',
-      plannedStart: '09:00',
-      plannedEnd: '14:00',
-      actualStart: '09:10',
-      actualEnd: '14:05',
-      plannedPickup: false,
-      plannedReturn: true,
-      actualPickup: false,
-      actualReturn: true,
-      notes: 'おやつ完食',
-      lunch: true,
-      dinner: true,
-      plannedPickupLocation: '学校',
-      plannedReturnLocation: '学校',
-    },
-    {
-      id: '3',
-      name: '鈴木 花子',
-      avatar: kid,
-      className: '年少クラス',
-      plannedStart: '08:30',
-      plannedEnd: '16:30',
-      actualStart: '08:35',
-      actualEnd: '',
-      plannedPickup: true,
-      plannedReturn: true,
-      actualPickup: true,
-      actualReturn: false,
-      isAbsent: true,
-      notes: '体調不良のため早退',
-      lunch: true,
-      dinner: true,
-      plannedPickupLocation: '学校',
-      plannedReturnLocation: '学校',
-    },
-    {
-      id: '4',
-      name: '田中 優子',
-      avatar: kid,
-      className: '年長クラス',
-      plannedStart: '09:30',
-      plannedEnd: '18:00',
-      actualStart: '09:25',
-      actualEnd: '18:05',
-      plannedPickup: true,
-      plannedReturn: true,
-      actualPickup: true,
-      actualReturn: true,
-      hadSnack: true,
-      lunch: true,
-      dinner: true,
-      plannedPickupLocation: '学校',
-      plannedReturnLocation: '学校',
-    },
-    {
-      id: '5',
-      name: '山田 健太',
-      avatar: kid,
-      className: '年中クラス',
-      plannedStart: '08:00',
-      plannedEnd: '15:00',
-      actualStart: '08:00',
-      actualEnd: '15:00',
-      plannedPickup: false,
-      plannedReturn: false,
-      actualPickup: false,
-      actualReturn: false,
-      hadSnack: true,
-      lunch: true,
-      dinner: true,
-      plannedPickupLocation: '学校',
-      plannedReturnLocation: '学校',
-    },
-    {
-      id: '6',
-      name: '伊藤 美咲',
-      avatar: kid,
-      className: '年少クラス',
-      plannedStart: '10:00',
-      plannedEnd: '16:00',
-      actualStart: '',
-      actualEnd: '',
-      plannedPickup: true,
-      plannedReturn: true,
-      actualPickup: false,
-      actualReturn: false,
-      isAbsent: true,
-      notes: '発熱のため欠席',
-      lunch: true,
-      dinner: true,
-      plannedPickupLocation: '学校',
-      plannedReturnLocation: '学校',
-    },
-    {
-      id: '7',
-      name: '渡辺 翔太',
-      avatar: kid,
-      className: '年長クラス',
-      plannedStart: '09:00',
-      plannedEnd: '17:00',
-      actualStart: '09:15',
-      actualEnd: '17:00',
-      plannedPickup: true,
-      plannedReturn: true,
-      actualPickup: true,
-      actualReturn: true,
-      hadSnack: true,
-      lunch: true,
-      dinner: true,
-      plannedPickupLocation: '学校',
-      plannedReturnLocation: '学校',
-    },
-    {
-      id: '8',
-      name: '小林 さくら',
-      avatar: kid,
-      className: '年中クラス',
-      plannedStart: '08:30',
-      plannedEnd: '16:30',
-      actualStart: '08:40',
-      actualEnd: '16:25',
-      plannedPickup: false,
-      plannedReturn: true,
-      actualPickup: false,
-      actualReturn: true,
-      hadSnack: true,
-      lunch: true,
-      dinner: true,
-      plannedPickupLocation: '学校',
-      plannedReturnLocation: '学校',
-    },
-    {
-      id: '9',
-      name: '加藤 陽太',
-      avatar: kid,
-      className: '年少クラス',
-      plannedStart: '09:30',
-      plannedEnd: '15:30',
-      actualStart: '09:35',
-      actualEnd: '15:35',
-      plannedPickup: true,
-      plannedReturn: false,
-      actualPickup: true,
-      actualReturn: false,
-      hadSnack: true,
-      lunch: true,
-      dinner: true,
-      plannedPickupLocation: '学校',
-      plannedReturnLocation: '学校',
-    },
-    {
-      id: '10',
-      name: '吉田 めぐみ',
-      avatar: kid,
-      className: '年長クラス',
-      plannedStart: '08:00',
-      plannedEnd: '18:00',
-      actualStart: '08:05',
-      actualEnd: '18:00',
-      plannedPickup: true,
-      plannedReturn: true,
-      actualPickup: true,
-      actualReturn: true,
-      hadSnack: true,
-      isNight: true,
-      lunch: true,
-      dinner: true,
-      plannedPickupLocation: '学校',
-      plannedReturnLocation: '学校',
-    },
-  ]);
+  const [scheduleData, setScheduleData] = useState<ParentScheduleData[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Load schedule data for the selected date
+  const loadScheduleData = async (date: Date) => {
+    try {
+      setIsLoading(true);
+      const month = (date.getMonth() + 1).toString();
+      const year = date.getFullYear().toString();
+      const day = date.getDate().toString();
+
+      const response = await scheduleApi.getScheduleStats(month, day, year);
+
+      // Check if we have schedules data
+      if (response && response.stats) {
+        setScheduleData(response.stats);
+      } else {
+        console.log('No schedules data in response'); // Debug log
+        setScheduleData([]);
+      }
+    } catch (error) {
+      console.error('Error loading schedule data:', error);
+      toast.error('スケジュールデータの読み込みに失敗しました');
+      setScheduleData([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Load data when date changes
+  useEffect(() => {
+    loadScheduleData(selectedDate);
+  }, [selectedDate]);
+
   const handlePrevDate = () => {
     const newDate = new Date(selectedDate);
     newDate.setDate(newDate.getDate() - 1);
@@ -242,6 +53,7 @@ const ScheduleStats: React.FC = () => {
     newDate.setDate(newDate.getDate() + 1);
     setSelectedDate(newDate);
   };
+
   const handleInputChange = (
     index: number,
     field: keyof ParentScheduleEntry,
@@ -250,9 +62,33 @@ const ScheduleStats: React.FC = () => {
     const newScheduleData = [...scheduleData];
     newScheduleData[index] = {
       ...newScheduleData[index],
-      [field]: value,
+      scheduleInfo: {
+        ...newScheduleData[index].scheduleInfo,
+        [field]: value,
+      },
     };
     setScheduleData(newScheduleData);
+  };
+
+  const handleSubmit = async () => {
+    try {
+      setIsLoading(true);
+      const month = (selectedDate.getMonth() + 1).toString();
+      const day = selectedDate.getDate().toString();
+      const year = selectedDate.getFullYear().toString();
+      const response = await scheduleApi.submitScheduleStats(
+        month,
+        day,
+        year,
+        scheduleData
+      );
+      toast.success('スケジュール提出成功');
+    } catch (error) {
+      console.error('スケジュール提出エラー:', error);
+      toast.error('スケジュール提出に失敗しました');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleTimeChange = (
@@ -262,9 +98,70 @@ const ScheduleStats: React.FC = () => {
   ) => {
     handleInputChange(index, field, value);
   };
+
   const handleTodayDate = () => {
     setSelectedDate(new Date());
   };
+
+  const headerData = (
+    <thead>
+      <tr className="border-b border-stroke bg-gray-2 dark:border-strokedark dark:bg-meta-4">
+        <th className="p-2.5 text-center">
+          <h5 className="text-sm font-medium">名前</h5>
+        </th>
+        <th className="p-2.5 text-center">
+          <h5 className="text-sm font-medium">出欠</h5>
+        </th>
+        <th className="p-2.5 text-center">
+          <h5 className="text-sm font-medium">欠席</h5>
+        </th>
+        <th
+          colSpan={4}
+          className="border-l border-r border-stroke dark:border-strokedark"
+        >
+          <div className="border-b px-4 py-2 text-center">
+            <span className="text-sm font-medium">予定</span>
+          </div>
+          <div className="grid grid-cols-4">
+            <div className="col-span-2 border-r border-stroke px-4 py-2 text-center dark:border-strokedark">
+              <span className="text-sm font-medium">時間</span>
+            </div>
+            <div className="px-4 py-2 text-center">
+              <span className="text-sm font-medium">往</span>
+            </div>
+            <div className="px-4 py-2 text-center">
+              <span className="text-sm font-medium">復</span>
+            </div>
+          </div>
+        </th>
+        <th
+          colSpan={2}
+          className="border-l border-r border-stroke dark:border-strokedark"
+        >
+          <div className="border-b px-4 py-2 text-center">
+            <span className="text-sm font-medium">実績</span>
+          </div>
+          <div className="grid grid-cols-2">
+            <div className="col-span-2 px-4 py-2 text-center">
+              <span className="text-sm font-medium">時間</span>
+            </div>
+          </div>
+        </th>
+        <th className="p-2.5 text-center">
+          <h5 className="text-sm font-medium">おやつ</h5>
+        </th>
+        <th className="p-2.5 text-center">
+          <h5 className="text-sm font-medium">昼食</h5>
+        </th>
+        <th className="p-2.5 text-center">
+          <h5 className="text-sm font-medium">夕食</h5>
+        </th>
+        <th className="p-2.5 text-center">
+          <h5 className="text-sm font-medium">備考</h5>
+        </th>
+      </tr>
+    </thead>
+  );
 
   return (
     <DefaultLayout>
@@ -313,6 +210,15 @@ const ScheduleStats: React.FC = () => {
               </button>
             </div>
             <div className="flex items-center gap-2">
+              {/** Submit button */}
+              <button
+                type="button"
+                disabled={isLoading}
+                onClick={handleSubmit}
+                className="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              >
+                {isLoading ? '提出中...' : 'スケジュール提出'}
+              </button>
               {/** Download button */}
               <button className="inline-flex items-center gap-2 rounded bg-primary px-4 py-2 font-medium text-white hover:bg-opacity-90">
                 <svg
@@ -338,233 +244,202 @@ const ScheduleStats: React.FC = () => {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-stroke bg-gray-2 dark:border-strokedark dark:bg-meta-4">
-                  <th className="p-2.5 text-center">
-                    <h5 className="text-sm font-medium">名前</h5>
-                  </th>
-                  <th className="p-2.5 text-center">
-                    <h5 className="text-sm font-medium">クラス</h5>
-                  </th>
-                  <th className="p-2.5 text-center">
-                    <h5 className="text-sm font-medium">出欠</h5>
-                  </th>
-                  <th className="p-2.5 text-center">
-                    <h5 className="text-sm font-medium">欠席</h5>
-                  </th>
-                  <th
-                    colSpan={4}
-                    className="border-l border-r border-stroke dark:border-strokedark"
-                  >
-                    <div className="border-b px-4 py-2 text-center">
-                      <span className="text-sm font-medium">予定</span>
-                    </div>
-                    <div className="grid grid-cols-4">
-                      <div className="col-span-2 border-r border-stroke px-4 py-2 text-center dark:border-strokedark">
-                        <span className="text-sm font-medium">時間</span>
-                      </div>
-                      <div className="px-4 py-2 text-center">
-                        <span className="text-sm font-medium">往</span>
-                      </div>
-                      <div className="px-4 py-2 text-center">
-                        <span className="text-sm font-medium">復</span>
-                      </div>
-                    </div>
-                  </th>
-                  <th
-                    colSpan={2}
-                    className="border-l border-r border-stroke dark:border-strokedark"
-                  >
-                    <div className="border-b px-4 py-2 text-center">
-                      <span className="text-sm font-medium">実績</span>
-                    </div>
-                    <div className="grid grid-cols-2">
-                      <div className="col-span-2 px-4 py-2 text-center">
-                        <span className="text-sm font-medium">時間</span>
-                      </div>
-                    </div>
-                  </th>
-                  <th className="p-2.5 text-center">
-                    <h5 className="text-sm font-medium">おやつ</h5>
-                  </th>
-                  <th className="p-2.5 text-center">
-                    <h5 className="text-sm font-medium">昼食</h5>
-                  </th>
-                  <th className="p-2.5 text-center">
-                    <h5 className="text-sm font-medium">夕食</h5>
-                  </th>
-                  <th className="p-2.5 text-center">
-                    <h5 className="text-sm font-medium">備考</h5>
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-stroke dark:divide-strokedark">
-                {scheduleData.map((entry, index) => (
-                  <tr key={entry.id}>
-                    <td className="border-stroke p-2.5 dark:border-strokedark">
-                      <div className="flex items-center gap-3">
-                        <div className="h-12 w-12 overflow-hidden rounded-full">
-                          <img src={entry.avatar} alt="User" />
-                        </div>
-                        <p className="text-sm">{entry.name}</p>
-                      </div>
-                    </td>
-                    <td className="border-stroke p-2.5 text-center dark:border-strokedark">
-                      <p className="text-sm">{entry.className}</p>
-                    </td>
-                    <td className="border-stroke p-2.5 text-center dark:border-strokedark">
-                      <div className="flex items-center justify-center">
-                        <input
-                          type="checkbox"
-                          checked={!entry.isAbsent}
-                          onChange={(e) =>
-                            handleInputChange(
-                              index,
-                              'isAbsent',
-                              !e.target.checked
-                            )
-                          }
-                          className="h-4 w-4"
-                        />
-                      </div>
-                    </td>
-                    <td className="border-stroke p-2.5 text-center dark:border-strokedark">
-                      <div className="flex items-center justify-center">
-                        <input
-                          type="checkbox"
-                          checked={entry.isAbsent}
-                          onChange={(e) =>
-                            handleInputChange(
-                              index,
-                              'isAbsent',
-                              e.target.checked
-                            )
-                          }
-                          className="h-4 w-4"
-                        />
-                      </div>
-                    </td>
-                    <td
-                      colSpan={4}
-                      className="border-l border-r border-stroke dark:border-strokedark"
-                    >
-                      <div className="grid grid-cols-4">
-                        <div className="col-span-2 flex items-center gap-2 border-r border-stroke p-2.5 dark:border-strokedark">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm">
-                              {entry.plannedStart}
-                            </span>
-                            <span>-</span>
-                            <span className="text-sm">{entry.plannedEnd}</span>
+            {isLoading ? (
+              <>
+                {' '}
+                <table className="w-full">{headerData}</table>
+                <div className="flex h-40 items-center justify-center">
+                  <p>データを読み込んでいます...</p>
+                </div>
+              </>
+            ) : scheduleData.length > 0 ? (
+              <table className="w-full">
+                {headerData}
+                <tbody className="divide-y divide-stroke dark:divide-strokedark">
+                  {scheduleData.map((entry, index) => (
+                    <tr key={entry.user.id}>
+                      <td className="border-stroke p-2.5 dark:border-strokedark">
+                        <div className="flex items-center gap-3">
+                          <div className="h-12 w-12 overflow-hidden rounded-full">
+                            <img src={entry.user.avatar} alt="User" />
                           </div>
+                          <p className="text-sm">{entry.user.username}</p>
                         </div>
+                      </td>
+                      <td className="border-stroke p-2.5 text-center dark:border-strokedark">
                         <div className="flex items-center justify-center">
-                          <div className="flex h-8 min-w-[3.75rem] items-center justify-center rounded border border-stroke px-2">
-                            <span className="text-sm">
-                              {entry.plannedPickupLocation}
-                            </span>
-                          </div>
+                          <input
+                            type="checkbox"
+                            checked={!entry.scheduleInfo.wasAbsent}
+                            onChange={(e) =>
+                              handleInputChange(
+                                index,
+                                'wasAbsent',
+                                !e.target.checked
+                              )
+                            }
+                            className="h-4 w-4"
+                          />
                         </div>
+                      </td>
+                      <td className="border-stroke p-2.5 text-center dark:border-strokedark">
                         <div className="flex items-center justify-center">
-                          <div className="flex h-8 min-w-[3.75rem] items-center justify-center rounded border border-stroke px-2">
-                            <span className="text-sm">
-                              {entry.plannedReturnLocation}
-                            </span>
+                          <input
+                            type="checkbox"
+                            checked={entry.scheduleInfo.wasAbsent}
+                            onChange={(e) =>
+                              handleInputChange(
+                                index,
+                                'wasAbsent',
+                                e.target.checked
+                              )
+                            }
+                            className="h-4 w-4"
+                          />
+                        </div>
+                      </td>
+                      <td
+                        colSpan={4}
+                        className="border-l border-r border-stroke dark:border-strokedark"
+                      >
+                        <div className="grid grid-cols-4">
+                          <div className="col-span-2 flex items-center gap-2 border-r border-stroke p-2.5 dark:border-strokedark">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm">
+                                {entry.scheduleInfo.plannedStart}
+                              </span>
+                              <span>-</span>
+                              <span className="text-sm">
+                                {entry.scheduleInfo.plannedEnd}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-center">
+                            <div className="flex h-8 min-w-[3.75rem] items-center justify-center rounded px-2">
+                              <span className="text-sm">
+                                {entry.scheduleInfo.plannedPickupLocation}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-center">
+                            <div className="flex h-8 min-w-[3.75rem] items-center justify-center rounded px-2">
+                              <span className="text-sm">
+                                {entry.scheduleInfo.plannedReturnLocation}
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </td>
-                    <td
-                      colSpan={2}
-                      className="border-l border-r border-stroke dark:border-strokedark"
-                    >
-                      <div className="grid grid-cols-2">
-                        <div className="col-span-2 flex items-center justify-center gap-2 p-2.5">
-                          <div className="flex items-center gap-2">
+                      </td>
+                      <td
+                        colSpan={2}
+                        className="border-l border-r border-stroke dark:border-strokedark"
+                      >
+                        <div className="grid grid-cols-2">
+                          <div className="col-span-2 flex items-center justify-center gap-2 p-2.5">
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="time"
+                                value={entry.scheduleInfo.actualStart}
+                                onChange={(e) =>
+                                  handleTimeChange(
+                                    index,
+                                    'actualStart',
+                                    e.target.value
+                                  )
+                                }
+                                className="w-23 rounded border border-stroke bg-transparent px-2 py-1 text-sm dark:border-strokedark [&::-webkit-calendar-picker-indicator]:hidden"
+                              />
+                              <span>-</span>
+                              <input
+                                type="time"
+                                value={entry.scheduleInfo.actualEnd}
+                                onChange={(e) =>
+                                  handleTimeChange(
+                                    index,
+                                    'actualEnd',
+                                    e.target.value
+                                  )
+                                }
+                                className="w-23 rounded border border-stroke bg-transparent px-2 py-1 text-sm dark:border-strokedark [&::-webkit-calendar-picker-indicator]:hidden"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="border-stroke p-2.5 text-center dark:border-strokedark">
+                        <div className="flex items-center justify-center">
+                          <input
+                            type="checkbox"
+                            checked={entry.scheduleInfo.hadSnack}
+                            onChange={(e) =>
+                              handleInputChange(
+                                index,
+                                'hadSnack',
+                                e.target.checked
+                              )
+                            }
+                            className="h-4 w-4"
+                          />
+                        </div>
+                      </td>
+                      <td className="border-stroke p-2.5 text-center dark:border-strokedark">
+                        {entry.scheduleInfo.lunch && (
+                          <div className="flex items-center justify-center">
                             <input
-                              type="time"
-                              value={entry.actualStart}
+                              type="checkbox"
+                              checked={entry.scheduleInfo.hadLunch}
                               onChange={(e) =>
-                                handleTimeChange(
+                                handleInputChange(
                                   index,
-                                  'actualStart',
-                                  e.target.value
+                                  'hadLunch',
+                                  e.target.checked
                                 )
                               }
-                              className="w-23 rounded border border-stroke bg-transparent px-2 py-1 text-sm dark:border-strokedark [&::-webkit-calendar-picker-indicator]:hidden"
-                            />
-                            <span>-</span>
-                            <input
-                              type="time"
-                              value={entry.actualEnd}
-                              onChange={(e) =>
-                                handleTimeChange(
-                                  index,
-                                  'actualEnd',
-                                  e.target.value
-                                )
-                              }
-                              className="w-23 rounded border border-stroke bg-transparent px-2 py-1 text-sm dark:border-strokedark [&::-webkit-calendar-picker-indicator]:hidden"
+                              className="h-4 w-4"
                             />
                           </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="border-stroke p-2.5 text-center dark:border-strokedark">
-                      <div className="flex items-center justify-center">
+                        )}
+                      </td>
+                      <td className="border-stroke p-2.5 text-center dark:border-strokedark">
+                        {entry.scheduleInfo.dinner && (
+                          <div className="flex items-center justify-center">
+                            <input
+                              type="checkbox"
+                              checked={entry.scheduleInfo.hadDinner}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  index,
+                                  'hadDinner',
+                                  e.target.checked
+                                )
+                              }
+                              className="h-4 w-4"
+                            />
+                          </div>
+                        )}
+                      </td>
+                      <td className="border-stroke p-2.5 dark:border-strokedark">
                         <input
-                          type="checkbox"
-                          checked={entry.hadSnack}
+                          type="text"
+                          value={entry.scheduleInfo.remarks || ''}
                           onChange={(e) =>
-                            handleInputChange(
-                              index,
-                              'hadSnack',
-                              e.target.checked
-                            )
+                            handleInputChange(index, 'remarks', e.target.value)
                           }
-                          className="h-4 w-4"
+                          className="w-full rounded border border-stroke bg-transparent px-2 py-1 dark:border-strokedark"
                         />
-                      </div>
-                    </td>
-                    <td className="border-stroke p-2.5 text-center dark:border-strokedark">
-                      <div className="flex items-center justify-center">
-                        <input
-                          type="checkbox"
-                          checked={entry.lunch}
-                          onChange={(e) =>
-                            handleInputChange(index, 'lunch', e.target.checked)
-                          }
-                          className="h-4 w-4"
-                        />
-                      </div>
-                    </td>
-                    <td className="border-stroke p-2.5 text-center dark:border-strokedark">
-                      <div className="flex items-center justify-center">
-                        <input
-                          type="checkbox"
-                          checked={entry.dinner}
-                          onChange={(e) =>
-                            handleInputChange(index, 'dinner', e.target.checked)
-                          }
-                          className="h-4 w-4"
-                        />
-                      </div>
-                    </td>
-                    <td className="border-stroke p-2.5 dark:border-strokedark">
-                      <input
-                        type="text"
-                        value={entry.notes || ''}
-                        onChange={(e) =>
-                          handleInputChange(index, 'notes', e.target.value)
-                        }
-                        className="w-full rounded border border-stroke bg-transparent px-2 py-1 dark:border-strokedark"
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <>
+                <table className="w-full">{headerData}</table>
+                <div className="flex h-40 items-center justify-center">
+                  <p>この日の申し込みはありません</p>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

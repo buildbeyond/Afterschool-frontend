@@ -97,19 +97,19 @@ function AppContent() {
       <Route
         path="/schedule/input"
         element={
-          <RoleProtectedRoute allowedRoles={[UserRole.PARENT]}>
+          <ProtectedRoute allowedRoles={['parent']}>
             <PageTitle title="Schedule Input" />
             <ScheduleInput />
-          </RoleProtectedRoute>
+          </ProtectedRoute>
         }
       />
       <Route
         path="/schedule/stats"
         element={
-          <RoleProtectedRoute allowedRoles={[UserRole.COACH]}>
+          <ProtectedRoute allowedRoles={['coach']}>
             <PageTitle title="Schedule Statistics" />
             <ScheduleStats />
-          </RoleProtectedRoute>
+          </ProtectedRoute>
         }
       />
       <Route
