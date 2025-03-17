@@ -5,11 +5,58 @@ import DatePickerJp from '../../components/Forms/DatePicker/DatePickerJp';
 import { scheduleApi } from '../../services/api';
 import { toast } from 'react-toastify';
 import { ParentScheduleData, ParentScheduleEntry } from '../../types';
+import DefaultUser from '../../images/user/default.png';
+
+const premiumOptions: { label: string; value: keyof ParentScheduleEntry }[] = [
+  {
+    label: '家族支援加算',
+    value: 'familySupport',
+  },
+  {
+    label: '医療連携体制加算',
+    value: 'medicalSupport',
+  },
+  {
+    label: '延長支援加算',
+    value: 'extendedSupport',
+  },
+  {
+    label: '集中的支援加算',
+    value: 'concentratedSupport',
+  },
+  {
+    label: '専門的支援加算（支援実施時）',
+    value: 'specializedSupport',
+  },
+  {
+    label: '通所自立支援加算',
+    value: 'communitySupport',
+  },
+  {
+    label: '入浴支援加算',
+    value: 'bathSupport',
+  },
+  {
+    label: '子育てサポート加算',
+    value: 'childCareSupport',
+  },
+  {
+    label: '自立サポート加算',
+    value: 'selfSupport',
+  },
+  {
+    label: '保護者等確認欄',
+    value: 'guardianConfirmation',
+  },
+];
 
 const ScheduleStats: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [scheduleData, setScheduleData] = useState<ParentScheduleData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [activeDropdownIndex, setActiveDropdownIndex] = useState<number | null>(
+    null
+  );
 
   // Load schedule data for the selected date
   const loadScheduleData = async (date: Date) => {
@@ -76,12 +123,7 @@ const ScheduleStats: React.FC = () => {
       const month = (selectedDate.getMonth() + 1).toString();
       const day = selectedDate.getDate().toString();
       const year = selectedDate.getFullYear().toString();
-      const response = await scheduleApi.submitScheduleStats(
-        month,
-        day,
-        year,
-        scheduleData
-      );
+      await scheduleApi.submitScheduleStats(month, day, year, scheduleData);
       toast.success('スケジュール提出成功');
     } catch (error) {
       console.error('スケジュール提出エラー:', error);
@@ -101,6 +143,29 @@ const ScheduleStats: React.FC = () => {
 
   const handleTodayDate = () => {
     setSelectedDate(new Date());
+  };
+
+  const handleDownload = async (index: number) => {
+    try {
+      setIsLoading(true);
+      const month = (selectedDate.getMonth() + 1).toString();
+      const year = selectedDate.getFullYear().toString();
+      const user = scheduleData[index].user.id;
+      const data = await scheduleApi.downloadReportData(month, year, user);
+      const url = window.URL.createObjectURL(new Blob([data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute(
+        'download',
+        `実績-${scheduleData[index].user.username}.xlsx`
+      );
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch {
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const headerData = (
@@ -157,7 +222,13 @@ const ScheduleStats: React.FC = () => {
           <h5 className="text-sm font-medium">夕食</h5>
         </th>
         <th className="p-2.5 text-center">
+          <h5 className="text-sm font-medium">入力</h5>
+        </th>
+        <th className="p-2.5 text-center">
           <h5 className="text-sm font-medium">備考</h5>
+        </th>
+        <th className="p-2.5 text-center">
+          {/* <h5 className="text-sm font-medium">ダウンロード</h5> */}
         </th>
       </tr>
     </thead>
@@ -219,27 +290,6 @@ const ScheduleStats: React.FC = () => {
               >
                 スケジュール提出
               </button>
-              {/** Download button */}
-              <button className="inline-flex items-center gap-2 rounded bg-primary px-4 py-2 font-medium text-white hover:bg-opacity-90">
-                <svg
-                  className="fill-current"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 18 18"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M9 12.75L13.5 8.25H10.5V1.5H7.5V8.25H4.5L9 12.75Z"
-                    fill="currentColor"
-                  />
-                  <path
-                    d="M1.5 15.75H16.5V12.75H15V14.25H3V12.75H1.5V15.75Z"
-                    fill="currentColor"
-                  />
-                </svg>
-                ダウンロード
-              </button>
             </div>
           </div>
 
@@ -261,7 +311,10 @@ const ScheduleStats: React.FC = () => {
                       <td className="border-stroke p-2.5 dark:border-strokedark">
                         <div className="flex items-center gap-3">
                           <div className="h-12 w-12 overflow-hidden rounded-full">
-                            <img src={entry.user.avatar} alt="User" />
+                            <img
+                              src={entry.user.avatar || DefaultUser}
+                              alt="User"
+                            />
                           </div>
                           <p className="text-sm">{entry.user.username}</p>
                         </div>
@@ -418,6 +471,19 @@ const ScheduleStats: React.FC = () => {
                           </div>
                         )}
                       </td>
+                      <td className="border-stroke p-2.5 text-center dark:border-strokedark">
+                        <button
+                          className="bg-gray-200 rounded-md px-4 py-2 text-black"
+                          onClick={() => {
+                            // Toggle dropdown for this entry
+                            setActiveDropdownIndex(
+                              activeDropdownIndex === index ? null : index
+                            );
+                          }}
+                        >
+                          選択
+                        </button>
+                      </td>
                       <td className="border-stroke p-2.5 dark:border-strokedark">
                         <input
                           type="text"
@@ -427,6 +493,31 @@ const ScheduleStats: React.FC = () => {
                           }
                           className="w-full rounded border border-stroke bg-transparent px-2 py-1 dark:border-strokedark"
                         />
+                      </td>
+                      <td className="border-stroke p-2.5 dark:border-strokedark">
+                        {/** Download button */}
+                        <button
+                          className="inline-flex items-center gap-2 rounded bg-primary px-2 py-2 font-medium text-white hover:bg-opacity-90"
+                          onClick={() => handleDownload(index)}
+                        >
+                          <svg
+                            className="fill-current"
+                            width="18"
+                            height="18"
+                            viewBox="0 0 18 18"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M9 12.75L13.5 8.25H10.5V1.5H7.5V8.25H4.5L9 12.75Z"
+                              fill="currentColor"
+                            />
+                            <path
+                              d="M1.5 15.75H16.5V12.75H15V14.25H3V12.75H1.5V15.75Z"
+                              fill="currentColor"
+                            />
+                          </svg>
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -443,6 +534,87 @@ const ScheduleStats: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Full-screen modal for dropdown */}
+      {activeDropdownIndex !== null && (
+        <div
+          className="fixed inset-0 z-[10000] flex items-center justify-center bg-black bg-opacity-50 p-4"
+          onClick={(e) => {
+            // Close modal when clicking on the backdrop (not the content)
+            if (e.target === e.currentTarget) {
+              setActiveDropdownIndex(null);
+            }
+          }}
+        >
+          <div
+            className="w-full max-w-md rounded-lg bg-white shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium">選択</h3>
+                <button
+                  onClick={() => setActiveDropdownIndex(null)}
+                  className="text-gray-400 hover:text-gray-500"
+                >
+                  <svg
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div className="max-h-96 overflow-y-auto p-4">
+              {premiumOptions.map((option) => (
+                <label
+                  key={option.value}
+                  className="hover:bg-gray-100 flex cursor-pointer items-center rounded p-2"
+                >
+                  <input
+                    type="checkbox"
+                    value={option.value}
+                    checked={
+                      scheduleData[activeDropdownIndex]?.scheduleInfo[
+                        option.value
+                      ] as boolean
+                    }
+                    onChange={(e) => {
+                      if (activeDropdownIndex !== null) {
+                        handleInputChange(
+                          activeDropdownIndex,
+                          option.value as keyof ParentScheduleEntry,
+                          e.target.checked
+                        );
+                      }
+                    }}
+                    className="mr-3 h-5 w-5"
+                  />
+                  <span>{option.label}</span>
+                </label>
+              ))}
+            </div>
+
+            <div className="flex justify-end p-4">
+              <button
+                className="rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+                onClick={() => setActiveDropdownIndex(null)}
+              >
+                完了
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </DefaultLayout>
   );
 };

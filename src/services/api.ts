@@ -98,6 +98,16 @@ export const scheduleApi = {
     );
     return response.data;
   },
+
+  downloadReportData: async (month: string, year: string, user: string) => {
+    const response = await api.get(
+      `/downloads/report-data?month=${month}&year=${year}&user=${user}`,
+      {
+        responseType: 'blob',
+      }
+    );
+    return response.data;
+  },
 };
 
 export default api;

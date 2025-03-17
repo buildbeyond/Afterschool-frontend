@@ -26,6 +26,7 @@ export interface IRegisterInput {
 }
 
 export interface ParentScheduleEntry {
+  selectedOptions: any[];
   id: string;
   name: string;
   avatar?: string;
@@ -46,9 +47,20 @@ export interface ParentScheduleEntry {
   hadDinner?: boolean;
   notes?: string;
   remarks?: string;
+  familySupport?: boolean;
+  medicalSupport?: boolean;
+  extendedSupport?: boolean;
+  concentratedSupport?: boolean;
+  specializedSupport?: boolean;
+  communitySupport?: boolean;
+  bathSupport?: boolean;
+  childCareSupport?: boolean;
+  selfSupport?: boolean;
+  guardianConfirmation?: boolean;
 }
 
 export interface ParentScheduleData {
+  isDropdownOpen: any;
   user: {
     id: string;
     username: string;
