@@ -7,10 +7,22 @@ import { toast } from 'react-toastify';
 import { ParentScheduleData, ParentScheduleEntry } from '../../types';
 import DefaultUser from '../../images/user/default.png';
 
-const premiumOptions: { label: string; value: keyof ParentScheduleEntry }[] = [
+const premiumOptions: {
+  label: string;
+  type?: 'checkbox' | 'dropdown';
+  options?: { value: string; label: string }[];
+  value: keyof ParentScheduleEntry;
+}[] = [
   {
     label: '家族支援加算',
     value: 'familySupport',
+    type: 'dropdown',
+    options: [
+      { value: '1', label: '1' },
+      { value: '2', label: '2' },
+      { value: '3', label: '3' },
+      { value: '4', label: '4' },
+    ],
   },
   {
     label: '医療連携体制加算',
@@ -19,6 +31,12 @@ const premiumOptions: { label: string; value: keyof ParentScheduleEntry }[] = [
   {
     label: '延長支援加算',
     value: 'extendedSupport',
+    type: 'dropdown',
+    options: [
+      { value: '1', label: '1' },
+      { value: '2', label: '2' },
+      { value: '3', label: '3' },
+    ],
   },
   {
     label: '集中的支援加算',
@@ -473,7 +491,7 @@ const ScheduleStats: React.FC = () => {
                       </td>
                       <td className="border-stroke p-2.5 text-center dark:border-strokedark">
                         <button
-                          className="bg-gray-200 rounded-md px-4 py-2 text-black"
+                          className="bg-gray-200 rounded-md px-4 py-2"
                           onClick={() => {
                             // Toggle dropdown for this entry
                             setActiveDropdownIndex(
@@ -534,20 +552,18 @@ const ScheduleStats: React.FC = () => {
           </div>
         </div>
       </div>
-
       {/* Full-screen modal for dropdown */}
       {activeDropdownIndex !== null && (
         <div
-          className="fixed inset-0 z-[10000] flex items-center justify-center bg-black bg-opacity-50 p-4"
+          className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/30 p-4"
           onClick={(e) => {
-            // Close modal when clicking on the backdrop (not the content)
             if (e.target === e.currentTarget) {
               setActiveDropdownIndex(null);
             }
           }}
         >
           <div
-            className="w-full max-w-md rounded-lg bg-white shadow-xl"
+            className="w-full max-w-md rounded-lg border border-stroke bg-white shadow-xl dark:border-strokedark dark:bg-boxdark dark:text-bodydark"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-4">
@@ -575,33 +591,82 @@ const ScheduleStats: React.FC = () => {
             </div>
 
             <div className="max-h-96 overflow-y-auto p-4">
-              {premiumOptions.map((option) => (
-                <label
-                  key={option.value}
-                  className="hover:bg-gray-100 flex cursor-pointer items-center rounded p-2"
-                >
-                  <input
-                    type="checkbox"
-                    value={option.value}
-                    checked={
-                      scheduleData[activeDropdownIndex]?.scheduleInfo[
-                        option.value
-                      ] as boolean
-                    }
-                    onChange={(e) => {
-                      if (activeDropdownIndex !== null) {
+              <div className="space-y-3">
+                {premiumOptions.map((option) => (
+                  <div
+                    key={option.value}
+                    className={`flex items-center justify-between border-b border-stroke py-2 dark:border-b-strokedark ${
+                      option.type !== 'dropdown'
+                        ? 'hover:bg-gray-50 cursor-pointer dark:hover:bg-meta-4'
+                        : ''
+                    }`}
+                    onClick={() => {
+                      if (
+                        option.type !== 'dropdown' &&
+                        activeDropdownIndex !== null
+                      ) {
+                        const currentValue = scheduleData[activeDropdownIndex]
+                          ?.scheduleInfo[option.value] as boolean;
                         handleInputChange(
                           activeDropdownIndex,
                           option.value as keyof ParentScheduleEntry,
-                          e.target.checked
+                          !currentValue
                         );
                       }
                     }}
-                    className="mr-3 h-5 w-5"
-                  />
-                  <span>{option.label}</span>
-                </label>
-              ))}
+                  >
+                    <span className="text-sm">{option.label}</span>
+                    <div className="flex items-center">
+                      {option.type === 'dropdown' ? (
+                        <select
+                          value={
+                            (scheduleData[activeDropdownIndex]?.scheduleInfo[
+                              option.value
+                            ] as string) || ''
+                          }
+                          onChange={(e) => {
+                            if (activeDropdownIndex !== null) {
+                              handleInputChange(
+                                activeDropdownIndex,
+                                option.value as keyof ParentScheduleEntry,
+                                e.target.value
+                              );
+                            }
+                          }}
+                          className="ml-4 rounded border border-stroke bg-transparent px-2 py-1 dark:border-strokedark dark:bg-boxdark"
+                        >
+                          <option value="">選択</option>
+                          {option.options?.map((opt) => (
+                            <option key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <input
+                          type="checkbox"
+                          checked={
+                            scheduleData[activeDropdownIndex]?.scheduleInfo[
+                              option.value
+                            ] as boolean
+                          }
+                          onChange={(e) => {
+                            if (activeDropdownIndex !== null) {
+                              handleInputChange(
+                                activeDropdownIndex,
+                                option.value as keyof ParentScheduleEntry,
+                                e.target.checked
+                              );
+                            }
+                          }}
+                          onClick={(e) => e.stopPropagation()} // Prevent double-triggering
+                          className="ml-4 h-5 w-5"
+                        />
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="flex justify-end p-4">

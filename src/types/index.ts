@@ -11,6 +11,14 @@ export interface IUser {
   createdAt: string;
   updatedAt: string;
   avatar: string;
+  recipientNumbers: string;
+  companyName: string;
+  businessNumbers: string;
+  guardianName: string;
+  serviceSlot: {
+    attendance: { start: string; end: string }[];
+    holiday: { start: string; end: string }[];
+  };
 }
 
 export interface ILoginInput {
@@ -47,9 +55,9 @@ export interface ParentScheduleEntry {
   hadDinner?: boolean;
   notes?: string;
   remarks?: string;
-  familySupport?: boolean;
+  familySupport?: string;
   medicalSupport?: boolean;
-  extendedSupport?: boolean;
+  extendedSupport?: string;
   concentratedSupport?: boolean;
   specializedSupport?: boolean;
   communitySupport?: boolean;

@@ -108,6 +108,11 @@ export const scheduleApi = {
     );
     return response.data;
   },
+
+  saveProfile: async (profileData: any) => {
+    const response = await api.post('/auth/save-profile', { profileData });
+    return response.data;
+  },
 };
 
 export default api;

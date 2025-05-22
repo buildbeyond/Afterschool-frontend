@@ -87,10 +87,9 @@ function AppContent() {
               }
             />
           ) : (
-            <>
-              <PageTitle title="After School" />
-              <LandingPage />
-            </>
+            <Navigate
+              to={'/auth/signin'}
+            />
           )
         }
       />
