@@ -6,6 +6,8 @@ import { scheduleApi } from '../../services/api';
 import { toast } from 'react-toastify';
 import { ParentScheduleData, ParentScheduleEntry } from '../../types';
 import DefaultUser from '../../images/user/default.png';
+import { EyeIcon } from '@heroicons/react/24/outline';
+import { useNavigate } from 'react-router-dom';
 
 const premiumOptions: {
   label: string;
@@ -75,6 +77,7 @@ const ScheduleStats: React.FC = () => {
   const [activeDropdownIndex, setActiveDropdownIndex] = useState<number | null>(
     null
   );
+  const navigate = useNavigate();
 
   // Load schedule data for the selected date
   const loadScheduleData = async (date: Date) => {
@@ -184,6 +187,10 @@ const ScheduleStats: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleViewUserSchedule = (index: number) => {
+    navigate(`/schedule/${scheduleData[index].user.id}`);
   };
 
   const headerData = (
@@ -327,7 +334,7 @@ const ScheduleStats: React.FC = () => {
                   {scheduleData.map((entry, index) => (
                     <tr key={entry.user.id}>
                       <td className="border-stroke p-2.5 dark:border-strokedark">
-                        <div className="flex items-center gap-3">
+                        <div className="flex min-w-max items-center gap-3">
                           <div className="h-12 w-12 overflow-hidden rounded-full">
                             <img
                               src={entry.user.avatar || DefaultUser}
@@ -338,7 +345,7 @@ const ScheduleStats: React.FC = () => {
                         </div>
                       </td>
                       <td className="border-stroke p-2.5 text-center dark:border-strokedark">
-                        <div className="flex items-center justify-center">
+                        <div className="flex min-w-max items-center justify-center">
                           <input
                             type="checkbox"
                             checked={!entry.scheduleInfo.wasAbsent}
@@ -354,7 +361,7 @@ const ScheduleStats: React.FC = () => {
                         </div>
                       </td>
                       <td className="border-stroke p-2.5 text-center dark:border-strokedark">
-                        <div className="flex items-center justify-center">
+                        <div className="flex min-w-max items-center justify-center">
                           <input
                             type="checkbox"
                             checked={entry.scheduleInfo.wasAbsent}
@@ -373,7 +380,7 @@ const ScheduleStats: React.FC = () => {
                         colSpan={4}
                         className="border-l border-r border-stroke dark:border-strokedark"
                       >
-                        <div className="grid grid-cols-4">
+                        <div className="grid min-w-max grid-cols-4">
                           <div className="col-span-2 flex items-center gap-2 border-r border-stroke p-2.5 dark:border-strokedark">
                             <div className="flex items-center gap-2">
                               <span className="text-sm">
@@ -405,7 +412,7 @@ const ScheduleStats: React.FC = () => {
                         colSpan={2}
                         className="border-l border-r border-stroke dark:border-strokedark"
                       >
-                        <div className="grid grid-cols-2">
+                        <div className="grid min-w-max grid-cols-2">
                           <div className="col-span-2 flex items-center justify-center gap-2 p-2.5">
                             <div className="flex items-center gap-2">
                               <input
@@ -438,7 +445,7 @@ const ScheduleStats: React.FC = () => {
                         </div>
                       </td>
                       <td className="border-stroke p-2.5 text-center dark:border-strokedark">
-                        <div className="flex items-center justify-center">
+                        <div className="flex min-w-max items-center justify-center">
                           <input
                             type="checkbox"
                             checked={entry.scheduleInfo.hadSnack}
@@ -455,7 +462,7 @@ const ScheduleStats: React.FC = () => {
                       </td>
                       <td className="border-stroke p-2.5 text-center dark:border-strokedark">
                         {entry.scheduleInfo.lunch && (
-                          <div className="flex items-center justify-center">
+                          <div className="flex min-w-max items-center justify-center">
                             <input
                               type="checkbox"
                               checked={entry.scheduleInfo.hadLunch}
@@ -473,7 +480,7 @@ const ScheduleStats: React.FC = () => {
                       </td>
                       <td className="border-stroke p-2.5 text-center dark:border-strokedark">
                         {entry.scheduleInfo.dinner && (
-                          <div className="flex items-center justify-center">
+                          <div className="flex min-w-max items-center justify-center">
                             <input
                               type="checkbox"
                               checked={entry.scheduleInfo.hadDinner}
@@ -491,7 +498,7 @@ const ScheduleStats: React.FC = () => {
                       </td>
                       <td className="border-stroke p-2.5 text-center dark:border-strokedark">
                         <button
-                          className="bg-gray-200 rounded-md px-4 py-2"
+                          className="bg-gray-200 min-w-max rounded-md px-4 py-2"
                           onClick={() => {
                             // Toggle dropdown for this entry
                             setActiveDropdownIndex(
@@ -509,33 +516,42 @@ const ScheduleStats: React.FC = () => {
                           onChange={(e) =>
                             handleInputChange(index, 'remarks', e.target.value)
                           }
-                          className="w-full rounded border border-stroke bg-transparent px-2 py-1 dark:border-strokedark"
+                          className="w-full min-w-32 rounded border border-stroke bg-transparent px-2 py-1 dark:border-strokedark"
                         />
                       </td>
                       <td className="border-stroke p-2.5 dark:border-strokedark">
-                        {/** Download button */}
-                        <button
-                          className="inline-flex items-center gap-2 rounded bg-primary px-2 py-2 font-medium text-white hover:bg-opacity-90"
-                          onClick={() => handleDownload(index)}
-                        >
-                          <svg
-                            className="fill-current"
-                            width="18"
-                            height="18"
-                            viewBox="0 0 18 18"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
+                        <div className="flex min-w-max items-center gap-2">
+                          {/** Download button */}
+                          <button
+                            className="inline-flex items-center gap-2 rounded bg-primary px-2 py-2 font-medium text-white hover:bg-opacity-90"
+                            onClick={() => handleDownload(index)}
                           >
-                            <path
-                              d="M9 12.75L13.5 8.25H10.5V1.5H7.5V8.25H4.5L9 12.75Z"
-                              fill="currentColor"
-                            />
-                            <path
-                              d="M1.5 15.75H16.5V12.75H15V14.25H3V12.75H1.5V15.75Z"
-                              fill="currentColor"
-                            />
-                          </svg>
-                        </button>
+                            <svg
+                              className="fill-current"
+                              width="18"
+                              height="18"
+                              viewBox="0 0 18 18"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M9 12.75L13.5 8.25H10.5V1.5H7.5V8.25H4.5L9 12.75Z"
+                                fill="currentColor"
+                              />
+                              <path
+                                d="M1.5 15.75H16.5V12.75H15V14.25H3V12.75H1.5V15.75Z"
+                                fill="currentColor"
+                              />
+                            </svg>
+                          </button>
+                          {/** View button */}
+                          <button
+                            className="ml-2 inline-flex items-center gap-2 rounded bg-primary px-2 py-2 font-medium text-white hover:bg-opacity-90"
+                            onClick={() => handleViewUserSchedule(index)}
+                          >
+                            <EyeIcon className="h-5 w-5" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
