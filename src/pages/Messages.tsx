@@ -227,14 +227,9 @@ const Messages: React.FC = () => {
       // Send message through Socket.IO
       if (attachment) {
         const formData = new FormData();
+        formData.append('receiver', otherUser._id);
         formData.append('attachment', attachment);
         const response = await uploadApi.uploadAttachment(formData);
-        console.log({
-          sender: user._id,
-          receiver: otherUser._id,
-          content: newMessage.trim(),
-          attachment: response.data.attachment,
-        });
         socketRef.current.emit('send_message', {
           sender: user._id,
           receiver: otherUser._id,
