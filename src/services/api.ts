@@ -113,6 +113,17 @@ export const scheduleApi = {
     const response = await api.post('/auth/save-profile', { profileData });
     return response.data;
   },
+
+  getIndividualSchedule: async (
+    month: string,
+    year: string,
+    userId: string
+  ) => {
+    const response = await api.get(
+      `/schedule/individual?month=${month}&year=${year}&userId=${userId}`
+    );
+    return response.data;
+  },
 };
 
 export default api;

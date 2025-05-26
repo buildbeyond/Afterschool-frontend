@@ -1,8 +1,10 @@
 import React from 'react';
+import CheckMark from '../../components/CheckMarks/CheckMark';
 
 interface ScheduleTableProps {
   scheduleData: ScheduleEntry[];
   onChange: (newSchedule: ScheduleEntry[]) => void;
+  disabled?: boolean;
 }
 
 interface ScheduleEntry {
@@ -27,6 +29,7 @@ type LocationType = '学校' | '自宅' | 'その他';
 const ScheduleTable: React.FC<ScheduleTableProps> = ({
   scheduleData,
   onChange,
+  disabled = false,
 }) => {
   const handleInputChange = (
     index: number,
@@ -51,9 +54,9 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
   const locationOptions = ['学校', '自宅', 'その他'] as const;
 
   return (
-    <div className="overflow-x-auto rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-      <table className="w-full min-w-[1000px]">
-        <thead>
+    <div className="max-h-[calc(100vh-300px)] overflow-x-auto rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+      <table className="w-full min-w-[1000px] table-auto">
+        <thead className="sticky top-0 z-10">
           <tr className="border-b border-stroke bg-gray-2 dark:border-strokedark dark:bg-meta-4">
             <th className="p-2.5 text-center text-sm font-medium">日付</th>
             <th className="p-2.5 text-center text-sm font-medium">休</th>
@@ -107,20 +110,24 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
                 </span>
               </td>
               <td className="p-2.5 text-center">
-                <input
-                  type="checkbox"
-                  checked={entry.isHoliday}
-                  onChange={(e) =>
-                    handleInputChange(index, 'isHoliday', e.target.checked)
-                  }
-                  className="h-4 w-4"
-                />
+                {disabled ? (
+                  entry.isHoliday && <CheckMark />
+                ) : (
+                  <input
+                    type="checkbox"
+                    checked={entry.isHoliday}
+                    onChange={(e) =>
+                      handleInputChange(index, 'isHoliday', e.target.checked)
+                    }
+                    className="h-4 w-4"
+                  />
+                )}
               </td>
               <td
                 colSpan={4}
                 className="border-l border-r border-stroke dark:border-strokedark"
               >
-                <div className="grid grid-cols-4">
+                <div className="grid min-w-max grid-cols-4">
                   <div className="col-span-2 flex items-center gap-2 border-r border-stroke p-2.5 dark:border-strokedark">
                     <input
                       type="time"
@@ -129,6 +136,7 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
                         handleTimeChange(index, 'plannedStart', e.target.value)
                       }
                       className="h-10 w-25 rounded border border-stroke bg-transparent px-2 dark:border-strokedark [&::-webkit-calendar-picker-indicator]:hidden"
+                      disabled={disabled}
                     />
                     <span>-</span>
                     <input
@@ -138,101 +146,152 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
                         handleTimeChange(index, 'plannedEnd', e.target.value)
                       }
                       className="h-10 w-25 rounded border border-stroke bg-transparent px-2 dark:border-strokedark [&::-webkit-calendar-picker-indicator]:hidden"
+                      disabled={disabled}
                     />
                   </div>
                   <div className="flex flex-row items-center justify-center gap-4">
-                    <input
-                      type="checkbox"
-                      checked={entry.plannedPickup}
-                      onChange={(e) =>
-                        handleInputChange(
-                          index,
-                          'plannedPickup',
-                          e.target.checked
-                        )
-                      }
-                      className="h-4 w-4"
-                    />
-                    <select
-                      value={entry.plannedPickupLocation}
-                      onChange={(e) =>
-                        handleInputChange(
-                          index,
-                          'plannedPickupLocation',
-                          e.target.value
-                        )
-                      }
-                      className="w-20 rounded border border-stroke bg-transparent px-1 py-0.5 text-sm dark:border-strokedark"
-                    >
-                      {locationOptions.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
+                    {disabled ? (
+                      entry.plannedPickup ? (
+                        <CheckMark />
+                      ) : (
+                        <div className="min-w-[25px]"></div>
+                      )
+                    ) : (
+                      <input
+                        type="checkbox"
+                        checked={entry.plannedPickup}
+                        onChange={(e) =>
+                          handleInputChange(
+                            index,
+                            'plannedPickup',
+                            e.target.checked
+                          )
+                        }
+                        className="h-4 w-4"
+                      />
+                    )}
+                    {disabled ? (
+                      <input
+                        type="input"
+                        value={entry.plannedPickupLocation}
+                        className="w-20 rounded border border-stroke bg-transparent px-1 py-0.5 text-sm dark:border-strokedark"
+                        disabled
+                      />
+                    ) : (
+                      <select
+                        value={entry.plannedPickupLocation}
+                        onChange={(e) =>
+                          handleInputChange(
+                            index,
+                            'plannedPickupLocation',
+                            e.target.value
+                          )
+                        }
+                        className="w-20 rounded border border-stroke bg-transparent px-1 py-0.5 text-sm dark:border-strokedark"
+                      >
+                        {locationOptions.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+                    )}
                   </div>
                   <div className="flex flex-row items-center justify-center gap-4">
-                    <input
-                      type="checkbox"
-                      checked={entry.plannedReturn}
-                      onChange={(e) =>
-                        handleInputChange(
-                          index,
-                          'plannedReturn',
-                          e.target.checked
-                        )
-                      }
-                      className="h-4 w-4"
-                    />
-                    <select
-                      value={entry.plannedReturnLocation}
-                      onChange={(e) =>
-                        handleInputChange(
-                          index,
-                          'plannedReturnLocation',
-                          e.target.value
-                        )
-                      }
-                      className="w-20 rounded border border-stroke bg-transparent px-1 py-0.5 text-sm dark:border-strokedark"
-                    >
-                      {locationOptions.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
+                    {disabled ? (
+                      entry.plannedReturn ? (
+                        <CheckMark />
+                      ) : (
+                        <div className="min-w-[25px]"></div>
+                      )
+                    ) : (
+                      <input
+                        type="checkbox"
+                        checked={entry.plannedReturn}
+                        onChange={(e) =>
+                          handleInputChange(
+                            index,
+                            'plannedReturn',
+                            e.target.checked
+                          )
+                        }
+                        className="h-4 w-4"
+                      />
+                    )}
+                    {disabled ? (
+                      <input
+                        type="input"
+                        value={entry.plannedReturnLocation}
+                        disabled
+                        className="w-20 rounded border border-stroke bg-transparent px-1 py-0.5 text-sm dark:border-strokedark"
+                      />
+                    ) : (
+                      <select
+                        value={entry.plannedReturnLocation}
+                        onChange={(e) =>
+                          handleInputChange(
+                            index,
+                            'plannedReturnLocation',
+                            e.target.value
+                          )
+                        }
+                        className="w-20 rounded border border-stroke bg-transparent px-1 py-0.5 text-sm dark:border-strokedark"
+                      >
+                        {locationOptions.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+                    )}
                   </div>
                 </div>
               </td>
               <td className="p-2.5 text-center">
-                <input
-                  type="checkbox"
-                  checked={entry.additionalUse}
-                  onChange={(e) =>
-                    handleInputChange(index, 'additionalUse', e.target.checked)
-                  }
-                  className="h-4 w-4"
-                />
+                {disabled ? (
+                  entry.additionalUse && <CheckMark />
+                ) : (
+                  <input
+                    type="checkbox"
+                    checked={entry.additionalUse}
+                    onChange={(e) =>
+                      handleInputChange(
+                        index,
+                        'additionalUse',
+                        e.target.checked
+                      )
+                    }
+                    className="h-4 w-4"
+                  />
+                )}
               </td>
               <td className="p-2.5 text-center">
-                <input
-                  type="checkbox"
-                  checked={entry.lunch}
-                  onChange={(e) =>
-                    handleInputChange(index, 'lunch', e.target.checked)
-                  }
-                  className="h-4 w-4"
-                />
+                {disabled ? (
+                  entry.lunch && <CheckMark />
+                ) : (
+                  <input
+                    type="checkbox"
+                    checked={entry.lunch}
+                    onChange={(e) =>
+                      handleInputChange(index, 'lunch', e.target.checked)
+                    }
+                    className="h-4 w-4"
+                  />
+                )}
               </td>
               <td className="border-r border-stroke p-2.5 text-center dark:border-strokedark">
-                <input
-                  type="checkbox"
-                  checked={entry.dinner}
-                  onChange={(e) =>
-                    handleInputChange(index, 'dinner', e.target.checked)
-                  }
-                  className="h-4 w-4"
-                />
+                {disabled ? (
+                  entry.dinner && <CheckMark />
+                ) : (
+                  <input
+                    type="checkbox"
+                    checked={entry.dinner}
+                    onChange={(e) =>
+                      handleInputChange(index, 'dinner', e.target.checked)
+                    }
+                    className="h-4 w-4"
+                  />
+                )}
               </td>
               <td className="p-2.5">
                 <input
@@ -242,6 +301,7 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
                     handleInputChange(index, 'notes', e.target.value)
                   }
                   className="w-full rounded border border-stroke bg-transparent px-2 py-1 dark:border-strokedark"
+                  disabled={disabled}
                 />
               </td>
             </tr>

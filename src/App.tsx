@@ -3,20 +3,18 @@ import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from './store/store';
 import { ProtectedRoute } from './components/ProtectedRoute';
-import { RoleProtectedRoute } from './components/RoleProtectedRoute';
 import { useAuth } from './hooks/useAuth';
-import { UserRole } from './types';
 
 import Messages from './pages/Messages';
 import Loader from './common/Loader';
 import PageTitle from './components/PageTitle';
-import LandingPage from './pages/Pages/LandingPage';
 import ScheduleInput from './pages/Schedule/ScheduleInput';
 import ScheduleStats from './pages/Schedule/ScheduleStatistics';
 import SignIn from './pages/Authentication/SignIn';
 import SignUp from './pages/Authentication/SignUp';
 import Unauthorized from './pages/Authentication/Unauthorized';
 import Profile from './pages/Profile';
+import ScheduleIndividual from './pages/Schedule/ScheduleIndividual';
 
 function AppContent() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -87,9 +85,7 @@ function AppContent() {
               }
             />
           ) : (
-            <Navigate
-              to={'/auth/signin'}
-            />
+            <Navigate to={'/auth/signin'} />
           )
         }
       />
@@ -108,6 +104,15 @@ function AppContent() {
           <ProtectedRoute allowedRoles={['coach']}>
             <PageTitle title="Schedule Statistics" />
             <ScheduleStats />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/schedule/:userId"
+        element={
+          <ProtectedRoute allowedRoles={['coach']}>
+            <PageTitle title="Individual Schedule" />
+            <ScheduleIndividual />
           </ProtectedRoute>
         }
       />

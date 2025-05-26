@@ -48,6 +48,7 @@ export interface ParentScheduleEntry {
   plannedReturnLocation: string;
   actualStart: string;
   actualEnd: string;
+  actualAmount: string;
   lunch: boolean;
   dinner: boolean;
   hadSnack?: boolean;
@@ -55,6 +56,7 @@ export interface ParentScheduleEntry {
   hadDinner?: boolean;
   notes?: string;
   remarks?: string;
+  supportType?: string;
   familySupport?: string;
   medicalSupport?: boolean;
   extendedSupport?: string;
