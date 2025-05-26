@@ -37,6 +37,19 @@ export const uploadApi = {
         'Content-Type': 'multipart/form-data',
       },
     }),
+  uploadAttachment: (formData: FormData) =>
+    api.post('/uploadAttachment', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }),
+};
+
+export const downloadApi = {
+  downloadAttachment: (attachmentId: string) =>
+    api.get(`/downloads/attachment?attachment_id=${attachmentId}`, {
+      responseType: 'blob',
+    }),
 };
 
 export interface ScheduleData {
