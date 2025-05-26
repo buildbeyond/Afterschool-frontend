@@ -37,6 +37,19 @@ export const uploadApi = {
         'Content-Type': 'multipart/form-data',
       },
     }),
+  uploadAttachment: (formData: FormData) =>
+    api.post('/uploadAttachment', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }),
+};
+
+export const downloadApi = {
+  downloadAttachment: (attachmentId: string) =>
+    api.get(`/downloads/attachment?attachment_id=${attachmentId}`, {
+      responseType: 'blob',
+    }),
 };
 
 export interface ScheduleData {
@@ -111,6 +124,17 @@ export const scheduleApi = {
 
   saveProfile: async (profileData: any) => {
     const response = await api.post('/auth/save-profile', { profileData });
+    return response.data;
+  },
+
+  getIndividualSchedule: async (
+    month: string,
+    year: string,
+    userId: string
+  ) => {
+    const response = await api.get(
+      `/schedule/individual?month=${month}&year=${year}&userId=${userId}`
+    );
     return response.data;
   },
 };

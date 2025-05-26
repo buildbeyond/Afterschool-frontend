@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import api from '../services/api';
+import api, { downloadApi, uploadApi } from '../services/api';
 import { io, Socket } from 'socket.io-client';
 import Cookies from 'js-cookie';
 import Breadcrumb from '../components/Breadcrumbs/Breadcrumb';
@@ -17,6 +17,7 @@ interface User {
   avatar: string;
   lastMessage?: {
     content: string;
+    attachment: string;
     createdAt: string;
   };
 }
@@ -31,6 +32,11 @@ interface Message {
   receiver: {
     _id: string;
     username: string;
+  };
+  attachment: {
+    _id: string;
+    fileName: string;
+    fileContent: string;
   };
   createdAt: string;
   read: boolean;
@@ -49,6 +55,8 @@ const Messages: React.FC = () => {
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
   const socketRef = useRef<Socket | null>(null);
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
+  const fileRef = useRef<HTMLInputElement | null>(null);
+  const [attachment, setAttachment] = useState<File | undefined>(undefined);
 
   const scrollToBottom = () => {
     if (chatContainerRef.current) {
@@ -212,19 +220,40 @@ const Messages: React.FC = () => {
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     const otherUser = user?.role === 'coach' ? selectedParent : coach;
-    if (!newMessage.trim() || !otherUser || !socketRef.current) return;
+    if ((!newMessage.trim() && !attachment) || !otherUser || !socketRef.current)
+      return;
 
     try {
       // Send message through Socket.IO
-      socketRef.current.emit('send_message', {
-        sender: user._id,
-        receiver: otherUser._id,
-        content: newMessage.trim(),
-      });
-
-      setNewMessage('');
+      if (attachment) {
+        const formData = new FormData();
+        formData.append('attachment', attachment);
+        const response = await uploadApi.uploadAttachment(formData);
+        console.log({
+          sender: user._id,
+          receiver: otherUser._id,
+          content: newMessage.trim(),
+          attachment: response.data.attachment,
+        });
+        socketRef.current.emit('send_message', {
+          sender: user._id,
+          receiver: otherUser._id,
+          content: newMessage.trim(),
+          attachment: response.data.attachment,
+        });
+      } else {
+        socketRef.current.emit('send_message', {
+          sender: user._id,
+          receiver: otherUser._id,
+          content: newMessage.trim(),
+        });
+      }
     } catch (error) {
       console.error('Error sending message:', error);
+    } finally {
+      setNewMessage('');
+      fileRef.current.value = '';
+      setAttachment(null);
     }
   };
 
@@ -237,6 +266,38 @@ const Messages: React.FC = () => {
 
   const handleBack = () => {
     setShowChat(false);
+  };
+
+  const handleAddAttachment = () => {
+    if (fileRef.current) {
+      fileRef.current.click();
+    }
+  };
+
+  const handleAttachmentChange = (e) => {
+    if (e.target.files[0]) {
+      setAttachment(e.target.files[0]);
+    }
+  };
+
+  const handleDownloadAttachment = async (
+    attachmentId: string,
+    fileName: string
+  ) => {
+    try {
+      const response = await downloadApi.downloadAttachment(attachmentId);
+      if (response.data) {
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', fileName);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      }
+    } catch (err) {
+      console.log('Error download attachment: ', err);
+    }
   };
 
   return (
@@ -285,7 +346,13 @@ const Messages: React.FC = () => {
                         </h5>
                         <p className="text-gray-6 dark:text-gray-4 truncate text-ellipsis text-sm">
                           {parent.lastMessage ? (
-                            parent.lastMessage.content
+                            parent.lastMessage.content ? (
+                              parent.lastMessage.content
+                            ) : parent.lastMessage.attachment ? (
+                              '[添付ファイルを送った。]'
+                            ) : (
+                              ''
+                            )
                           ) : (
                             <span>
                               メッセージは
@@ -398,6 +465,25 @@ const Messages: React.FC = () => {
                       >
                         {message.content}
                       </p>
+                      {message.attachment && (
+                        <div className="text-right">
+                          <span
+                            onClick={() =>
+                              handleDownloadAttachment(
+                                message.attachment._id,
+                                message.attachment.fileName
+                              )
+                            }
+                            className={`${
+                              message.sender._id === user?._id
+                                ? 'text-white'
+                                : 'text-slate-700 dark:text-white'
+                            } cursor-pointer text-sm underline hover:text-blue-400`}
+                          >
+                            {message.attachment.fileName}
+                          </span>
+                        </div>
+                      )}
                     </div>
                     <p
                       className={`text-gray-5 dark:text-gray-5 text-xs ${
@@ -412,20 +498,77 @@ const Messages: React.FC = () => {
               </div>
 
               <div className="sticky bottom-0 border-t border-stroke bg-white px-6 py-5 dark:border-strokedark dark:bg-boxdark">
-                <form
-                  className="flex items-center justify-between space-x-4.5"
-                  onSubmit={handleSendMessage}
-                >
-                  <div className="relative w-full">
-                    <input
-                      type="text"
-                      placeholder="メッセージを入力..."
-                      value={newMessage}
-                      onChange={(e) => setNewMessage(e.target.value)}
-                      className="dark:placeholder-gray-4 h-13 w-full rounded-md border border-stroke bg-gray pl-5 pr-19 text-black placeholder-body outline-none focus:border-primary dark:border-strokedark dark:bg-boxdark-2 dark:text-white"
-                    />
+                <div className="flex items-center">
+                  <div className="grow">
+                    <form onSubmit={handleSendMessage}>
+                      <div className="relative w-full">
+                        <input
+                          type="text"
+                          placeholder="メッセージを入力..."
+                          value={newMessage}
+                          onChange={(e) => setNewMessage(e.target.value)}
+                          className="dark:placeholder-gray-4 h-13 w-full rounded-md border border-stroke bg-gray pl-5 pr-19 text-black placeholder-body outline-none focus:border-primary dark:border-strokedark dark:bg-boxdark-2 dark:text-white"
+                        />
+                      </div>
+                    </form>
                   </div>
-                </form>
+                  <button
+                    className="h-13 w-13 rounded-md p-3 hover:bg-[rgba(0,0,0,0.1)]"
+                    onClick={handleAddAttachment}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="100%"
+                      height="100%"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                    >
+                      <path
+                        d="M20 10.9696L11.9628 18.5497C10.9782 19.4783 9.64274 20 8.25028 20C6.85782 20 5.52239 19.4783 4.53777 18.5497C3.55315 17.6211 3 16.3616 3 15.0483C3 13.7351 3.55315 12.4756 4.53777 11.547L12.575 3.96687C13.2314 3.34779 14.1217 3 15.05 3C15.9783 3 16.8686 3.34779 17.525 3.96687C18.1814 4.58595 18.5502 5.4256 18.5502 6.30111C18.5502 7.17662 18.1814 8.01628 17.525 8.63535L9.47904 16.2154C9.15083 16.525 8.70569 16.6989 8.24154 16.6989C7.77738 16.6989 7.33224 16.525 7.00403 16.2154C6.67583 15.9059 6.49144 15.4861 6.49144 15.0483C6.49144 14.6106 6.67583 14.1907 7.00403 13.8812L14.429 6.88674"
+                        stroke="#AEB7C0"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                    <input
+                      type="file"
+                      ref={fileRef}
+                      onChange={handleAttachmentChange}
+                      hidden
+                    />
+                  </button>
+                </div>
+                {attachment && (
+                  <div className="flex items-center justify-end pt-2">
+                    {attachment.name}
+                    <button
+                      onClick={() => {
+                        setAttachment(undefined);
+                      }}
+                      className="ml-2 h-6 w-6 items-center justify-center rounded-full"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="100%"
+                        height="100%"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <g id="Edit / Close_Circle">
+                          <path
+                            id="Vector"
+                            d="M9 9L11.9999 11.9999M11.9999 11.9999L14.9999 14.9999M11.9999 11.9999L9 14.9999M11.9999 11.9999L14.9999 9M12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21Z"
+                            stroke="#F43F8E"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </g>
+                      </svg>
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           )}

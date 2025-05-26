@@ -16,6 +16,15 @@ const premiumOptions: {
   value: keyof ParentScheduleEntry;
 }[] = [
   {
+    label: '提供形態',
+    value: 'supportType',
+    type: 'dropdown',
+    options: [
+      { value: '1', label: '1' },
+      { value: '2', label: '2' },
+    ],
+  },
+  {
     label: '家族支援加算',
     value: 'familySupport',
     type: 'dropdown',
@@ -318,7 +327,7 @@ const ScheduleStats: React.FC = () => {
             </div>
           </div>
 
-          <div className="overflow-x-auto">
+          <div className="max-h-[calc(100vh-300px)] overflow-x-auto">
             {isLoading ? (
               <>
                 {' '}
@@ -393,14 +402,38 @@ const ScheduleStats: React.FC = () => {
                             </div>
                           </div>
                           <div className="flex items-center justify-center">
-                            <div className="flex h-8 min-w-[3.75rem] items-center justify-center rounded px-2">
+                            <div className="flex h-8 min-w-[3.75rem] items-center justify-center gap-x-2 rounded px-2">
+                              <input
+                                type="checkbox"
+                                checked={entry.scheduleInfo.plannedPickup}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    index,
+                                    'plannedPickup',
+                                    e.target.checked
+                                  )
+                                }
+                                className="h-4 w-4"
+                              />
                               <span className="text-sm">
                                 {entry.scheduleInfo.plannedPickupLocation}
                               </span>
                             </div>
                           </div>
                           <div className="flex items-center justify-center">
-                            <div className="flex h-8 min-w-[3.75rem] items-center justify-center rounded px-2">
+                            <div className="flex h-8 min-w-[3.75rem] items-center justify-center gap-x-2 rounded px-2">
+                              <input
+                                type="checkbox"
+                                checked={entry.scheduleInfo.plannedReturn}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    index,
+                                    'plannedReturn',
+                                    e.target.checked
+                                  )
+                                }
+                                className="h-4 w-4"
+                              />
                               <span className="text-sm">
                                 {entry.scheduleInfo.plannedReturnLocation}
                               </span>
@@ -440,6 +473,26 @@ const ScheduleStats: React.FC = () => {
                                 }
                                 className="w-23 rounded border border-stroke bg-transparent px-2 py-1 text-sm dark:border-strokedark [&::-webkit-calendar-picker-indicator]:hidden"
                               />
+                              <select
+                                value={entry.scheduleInfo.actualAmount}
+                                onChange={(e) => {
+                                  handleInputChange(
+                                    index,
+                                    'actualAmount',
+                                    e.target.value
+                                  );
+                                }}
+                                className="ml-4 rounded border border-stroke bg-transparent px-2 py-1 dark:border-strokedark dark:bg-boxdark"
+                              >
+                                <option value="0">0</option>
+                                <option value="0.5">0.5</option>
+                                <option value="1.0">1.0</option>
+                                <option value="1.5">1.5</option>
+                                <option value="2.0">2.0</option>
+                                <option value="2.5">2.5</option>
+                                <option value="3.0">3.0</option>
+                                <option value="5.0">5.0</option>
+                              </select>
                             </div>
                           </div>
                         </div>
@@ -461,7 +514,21 @@ const ScheduleStats: React.FC = () => {
                         </div>
                       </td>
                       <td className="border-stroke p-2.5 text-center dark:border-strokedark">
-                        {entry.scheduleInfo.lunch && (
+                        <div className="flex min-w-max items-center justify-center">
+                          <input
+                            type="checkbox"
+                            checked={entry.scheduleInfo.lunch}
+                            onChange={(e) =>
+                              handleInputChange(
+                                index,
+                                'lunch',
+                                e.target.checked
+                              )
+                            }
+                            className="h-4 w-4"
+                          />
+                        </div>
+                        {/* {entry.scheduleInfo.lunch && (
                           <div className="flex min-w-max items-center justify-center">
                             <input
                               type="checkbox"
@@ -476,10 +543,24 @@ const ScheduleStats: React.FC = () => {
                               className="h-4 w-4"
                             />
                           </div>
-                        )}
+                        )} */}
                       </td>
                       <td className="border-stroke p-2.5 text-center dark:border-strokedark">
-                        {entry.scheduleInfo.dinner && (
+                        <div className="flex min-w-max items-center justify-center">
+                          <input
+                            type="checkbox"
+                            checked={entry.scheduleInfo.dinner}
+                            onChange={(e) =>
+                              handleInputChange(
+                                index,
+                                'dinner',
+                                e.target.checked
+                              )
+                            }
+                            className="h-4 w-4"
+                          />
+                        </div>
+                        {/* {entry.scheduleInfo.dinner && (
                           <div className="flex min-w-max items-center justify-center">
                             <input
                               type="checkbox"
@@ -494,7 +575,7 @@ const ScheduleStats: React.FC = () => {
                               className="h-4 w-4"
                             />
                           </div>
-                        )}
+                        )} */}
                       </td>
                       <td className="border-stroke p-2.5 text-center dark:border-strokedark">
                         <button
@@ -651,7 +732,9 @@ const ScheduleStats: React.FC = () => {
                           }}
                           className="ml-4 rounded border border-stroke bg-transparent px-2 py-1 dark:border-strokedark dark:bg-boxdark"
                         >
-                          <option value="">選択</option>
+                          {option.value !== 'supportType' && (
+                            <option value="">選択</option>
+                          )}
                           {option.options?.map((opt) => (
                             <option key={opt.value} value={opt.value}>
                               {opt.label}
