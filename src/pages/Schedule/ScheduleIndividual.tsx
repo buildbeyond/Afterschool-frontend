@@ -5,20 +5,26 @@ import DefaultLayout from '../../layout/DefaultLayout';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
 import { scheduleApi } from '../../services/api';
 import { toast } from 'react-toastify';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import DatePickerJp from '../../components/Forms/DatePicker/DatePickerJp';
 
 const ScheduleIndividual: React.FC = () => {
+  const { userId } = useParams();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const year = params.get('year');
+  const month = params.get('month');
+
+  let currentDate = new Date();
+  if (year && month) {
+    currentDate = new Date(parseInt(year), parseInt(month));
+  }
+
+  const [selectedDate, setSelectedDate] = useState<Date>(currentDate);
   const [scheduleData, setScheduleData] = useState<ScheduleEntry[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [currentUser, setCurrentUser] = useState<string>('');
   const navigate = useNavigate();
-
-  const { userId } = useParams();
-
-  // Get current month and year
-  const currentDate = new Date();
-  const currentMonth = currentDate.getMonth() + 1 + '';
-  const currentYear = currentDate.getFullYear() + '';
 
   const handleScheduleChange = (newSchedule: ScheduleEntry[]) => {
     setScheduleData(newSchedule);
@@ -26,6 +32,8 @@ const ScheduleIndividual: React.FC = () => {
 
   // Generate days for the current month
   const generateDaysForCurrentMonth = () => {
+    const currentMonth = selectedDate.getMonth() + 1 + '';
+    const currentYear = selectedDate.getFullYear() + '';
     const year = parseInt(currentYear);
     const month = parseInt(currentMonth) - 1; // JS months are 0-indexed
     const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -39,14 +47,14 @@ const ScheduleIndividual: React.FC = () => {
       days.push({
         date: i.toString(),
         day: dayNames[dayOfWeek],
-        isHoliday: dayOfWeek === 0 || dayOfWeek === 6, // Weekend
+        isHoliday: false,
         beAbsent: false,
-        plannedStart: dayOfWeek >= 1 && dayOfWeek <= 5 ? '09:00' : '', // Weekday default
-        plannedEnd: dayOfWeek >= 1 && dayOfWeek <= 5 ? '17:00' : '', // Weekday default
-        plannedPickup: dayOfWeek >= 1 && dayOfWeek <= 5, // Weekday default
-        plannedReturn: dayOfWeek >= 1 && dayOfWeek <= 5, // Weekday default
-        plannedPickupLocation: '学校',
-        plannedReturnLocation: '学校',
+        plannedStart: '',
+        plannedEnd: '',
+        plannedPickup: false,
+        plannedReturn: false,
+        plannedPickupLocation: '',
+        plannedReturnLocation: '',
         lunch: false,
         dinner: false,
       });
@@ -62,6 +70,8 @@ const ScheduleIndividual: React.FC = () => {
       const allDays = generateDaysForCurrentMonth();
 
       try {
+        const currentMonth = selectedDate.getMonth() + 1 + '';
+        const currentYear = selectedDate.getFullYear() + '';
         const response = await scheduleApi.getIndividualSchedule(
           currentMonth,
           currentYear,
@@ -109,26 +119,9 @@ const ScheduleIndividual: React.FC = () => {
     setScheduleData(generateDaysForCurrentMonth());
   }, []);
 
-  // const handleSubmit = async () => {
-  //   try {
-  //     setIsLoading(true);
-  //     await scheduleApi.submitSchedule({
-  //       month: currentMonth,
-  //       year: currentYear,
-  //       entries: scheduleData,
-  //     });
-  //     toast.success('スケジュール提出成功');
-  //   } catch (error) {
-  //     console.error('スケジュール提出エラー:', error);
-  //     toast.error('スケジュール提出に失敗しました');
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
   useEffect(() => {
     loadSchedule();
-  }, []);
+  }, [selectedDate, userId]);
 
   return (
     <DefaultLayout>
@@ -136,7 +129,7 @@ const ScheduleIndividual: React.FC = () => {
 
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="border-b border-stroke px-6.5 py-4 dark:border-strokedark">
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
             <button
               className="flex h-6 w-6 items-center justify-center rounded-full border border-slate-400 p-1 text-base text-slate-400"
               onClick={() => navigate('/schedule/stats')}
@@ -154,17 +147,16 @@ const ScheduleIndividual: React.FC = () => {
                 />
               </svg>
             </button>
-            <h3 className="font-medium text-black dark:text-white">
-              {currentUser}さんの{currentYear}年{currentMonth}月のスケジュール
-            </h3>
-            {/* <button
-              type="button"
-              disabled={isLoading}
-              onClick={handleSubmit}
-              className="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            >
-              スケジュール提出
-            </button> */}
+            <div className="flex items-center gap-x-4">
+              <DatePickerJp
+                selectedDate={selectedDate}
+                onDateChange={setSelectedDate}
+                isMonthSelector={true}
+              />
+              <h3 className="font-medium text-black dark:text-white">
+                {currentUser}さんのスケジュール
+              </h3>
+            </div>
           </div>
         </div>
 
@@ -179,6 +171,7 @@ const ScheduleIndividual: React.FC = () => {
                 scheduleData={scheduleData}
                 onChange={handleScheduleChange}
                 disabled={true}
+                showAchievements
               />
             </>
           )}

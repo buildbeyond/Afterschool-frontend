@@ -59,6 +59,11 @@ export interface ScheduleData {
 }
 
 export const scheduleApi = {
+  fetchAllParents: async () => {
+    const response = await api.get('/all-parents');
+    return response.data;
+  },
+
   submitSchedule: async (scheduleData: ScheduleData) => {
     const response = await api.post(`/schedule`, scheduleData);
     return response.data;

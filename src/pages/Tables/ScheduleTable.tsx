@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import CheckMark from '../../components/CheckMarks/CheckMark';
+import SelectWithInput from '../../components/SelectWithInput';
 
 interface ScheduleTableProps {
   scheduleData: ScheduleEntry[];
   onChange: (newSchedule: ScheduleEntry[]) => void;
   disabled?: boolean;
+  showAchievements?: boolean;
 }
 
 interface ScheduleEntry {
@@ -17,6 +19,9 @@ interface ScheduleEntry {
   plannedPickupLocation: LocationType;
   plannedReturn: boolean;
   plannedReturnLocation: LocationType;
+  actualStart: string;
+  actualEnd: string;
+  actualAmount: string;
   beAbsent: boolean;
   lunch: boolean;
   dinner: boolean;
@@ -24,12 +29,13 @@ interface ScheduleEntry {
   additionalUse: boolean;
 }
 
-type LocationType = '学校' | '自宅' | 'その他';
+type LocationType = '学校' | '自宅';
 
 const ScheduleTable: React.FC<ScheduleTableProps> = ({
   scheduleData,
   onChange,
   disabled = false,
+  showAchievements = false,
 }) => {
   const handleInputChange = (
     index: number,
@@ -51,7 +57,7 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
     handleInputChange(index, field, value);
   };
 
-  const locationOptions = ['学校', '自宅', 'その他'] as const;
+  const locationOptions = ['学校', '自宅'] as const;
 
   return (
     <div className="max-h-[calc(100vh-300px)] overflow-x-auto rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -79,6 +85,22 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
                 </div>
               </div>
             </th>
+
+            {showAchievements && (
+              <th
+                colSpan={2}
+                className="border-l border-r border-stroke dark:border-strokedark"
+              >
+                <div className="border-b px-4 py-2 text-center">
+                  <span className="text-sm font-medium">実績</span>
+                </div>
+                <div className="grid grid-cols-2">
+                  <div className="col-span-2 px-4 py-2 text-center">
+                    <span className="text-sm font-medium">時間</span>
+                  </div>
+                </div>
+              </th>
+            )}
 
             <th className="p-2.5 text-center text-sm font-medium">
               追加利用
@@ -128,7 +150,7 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
                 className="border-l border-r border-stroke dark:border-strokedark"
               >
                 <div className="grid min-w-max grid-cols-4">
-                  <div className="col-span-2 flex items-center gap-2 border-r border-stroke p-2.5 dark:border-strokedark">
+                  <div className="col-span-2 flex items-center justify-center gap-2 border-r border-stroke p-2.5 dark:border-strokedark">
                     <input
                       type="time"
                       value={entry.plannedStart}
@@ -149,7 +171,7 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
                       disabled={disabled}
                     />
                   </div>
-                  <div className="flex flex-row items-center justify-center gap-4">
+                  <div className="flex flex-row items-center justify-center gap-2 px-2">
                     {disabled ? (
                       entry.plannedPickup ? (
                         <CheckMark />
@@ -173,31 +195,39 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
                     {disabled ? (
                       <input
                         type="input"
+                        title={entry.plannedPickupLocation}
                         value={entry.plannedPickupLocation}
                         className="w-20 rounded border border-stroke bg-transparent px-1 py-0.5 text-sm dark:border-strokedark"
                         disabled
                       />
                     ) : (
-                      <select
+                      <SelectWithInput
+                        options={locationOptions.map((v) => v)}
                         value={entry.plannedPickupLocation}
-                        onChange={(e) =>
-                          handleInputChange(
-                            index,
-                            'plannedPickupLocation',
-                            e.target.value
-                          )
-                        }
-                        className="w-20 rounded border border-stroke bg-transparent px-1 py-0.5 text-sm dark:border-strokedark"
-                      >
-                        {locationOptions.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                      </select>
+                        onChange={(v) => {
+                          handleInputChange(index, 'plannedPickupLocation', v);
+                        }}
+                      />
+                      // <select
+                      //   value={entry.plannedPickupLocation}
+                      //   onChange={(e) =>
+                      //     handleInputChange(
+                      //       index,
+                      //       'plannedPickupLocation',
+                      //       e.target.value
+                      //     )
+                      //   }
+                      //   className="w-20 rounded border border-stroke bg-transparent px-1 py-0.5 text-sm dark:border-strokedark"
+                      // >
+                      //   {locationOptions.map((option) => (
+                      //     <option key={option} value={option}>
+                      //       {option}
+                      //     </option>
+                      //   ))}
+                      // </select>
                     )}
                   </div>
-                  <div className="flex flex-row items-center justify-center gap-4">
+                  <div className="flex flex-row items-center justify-center gap-2 px-2">
                     {disabled ? (
                       entry.plannedReturn ? (
                         <CheckMark />
@@ -221,32 +251,71 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
                     {disabled ? (
                       <input
                         type="input"
+                        title={entry.plannedReturnLocation}
                         value={entry.plannedReturnLocation}
                         disabled
                         className="w-20 rounded border border-stroke bg-transparent px-1 py-0.5 text-sm dark:border-strokedark"
                       />
                     ) : (
-                      <select
+                      <SelectWithInput
+                        options={locationOptions.map((v) => v)}
                         value={entry.plannedReturnLocation}
-                        onChange={(e) =>
-                          handleInputChange(
-                            index,
-                            'plannedReturnLocation',
-                            e.target.value
-                          )
-                        }
-                        className="w-20 rounded border border-stroke bg-transparent px-1 py-0.5 text-sm dark:border-strokedark"
-                      >
-                        {locationOptions.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                      </select>
+                        onChange={(v) => {
+                          handleInputChange(index, 'plannedReturnLocation', v);
+                        }}
+                      />
+                      // <select
+                      //   value={entry.plannedReturnLocation}
+                      //   onChange={(e) =>
+                      //     handleInputChange(
+                      //       index,
+                      //       'plannedReturnLocation',
+                      //       e.target.value
+                      //     )
+                      //   }
+                      //   className="w-20 rounded border border-stroke bg-transparent px-1 py-0.5 text-sm dark:border-strokedark"
+                      // >
+                      //   {locationOptions.map((option) => (
+                      //     <option key={option} value={option}>
+                      //       {option}
+                      //     </option>
+                      //   ))}
+                      // </select>
                     )}
                   </div>
                 </div>
               </td>
+              {showAchievements && (
+                <td
+                  colSpan={2}
+                  className="border-l border-r border-stroke dark:border-strokedark"
+                >
+                  <div className="grid min-w-max grid-cols-2">
+                    <div className="col-span-2 flex items-center justify-center gap-2 p-2.5">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="time"
+                          value={entry.actualStart}
+                          disabled
+                          className="w-24 rounded border border-stroke bg-transparent px-2 py-1 text-sm dark:border-strokedark [&::-webkit-calendar-picker-indicator]:hidden"
+                        />
+                        <span>-</span>
+                        <input
+                          type="time"
+                          value={entry.actualEnd}
+                          disabled
+                          className="w-24 rounded border border-stroke bg-transparent px-2 py-1 text-sm dark:border-strokedark [&::-webkit-calendar-picker-indicator]:hidden"
+                        />
+                        <input
+                          value={entry.actualAmount}
+                          disabled
+                          className="ml-4 w-10 rounded border border-stroke bg-transparent px-2 py-1 dark:border-strokedark dark:bg-boxdark"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              )}
               <td className="p-2.5 text-center">
                 {disabled ? (
                   entry.additionalUse && <CheckMark />

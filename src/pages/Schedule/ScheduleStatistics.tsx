@@ -199,7 +199,11 @@ const ScheduleStats: React.FC = () => {
   };
 
   const handleViewUserSchedule = (index: number) => {
-    navigate(`/schedule/${scheduleData[index].user.id}`);
+    navigate(
+      `/schedule/${
+        scheduleData[index].user.id
+      }?year=${selectedDate.getFullYear()}&month=${selectedDate.getMonth()}`
+    );
   };
 
   const headerData = (
@@ -322,7 +326,7 @@ const ScheduleStats: React.FC = () => {
                 onClick={handleSubmit}
                 className="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               >
-                スケジュール提出
+                入力反映
               </button>
             </div>
           </div>
@@ -345,12 +349,24 @@ const ScheduleStats: React.FC = () => {
                       <td className="border-stroke p-2.5 dark:border-strokedark">
                         <div className="flex min-w-max items-center gap-3">
                           <div className="h-12 w-12 overflow-hidden rounded-full">
-                            <img
-                              src={entry.user.avatar || DefaultUser}
-                              alt="User"
-                            />
+                            <a
+                              href="#"
+                              className="text-sm hover:text-blue-500"
+                              onClick={() => handleViewUserSchedule(index)}
+                            >
+                              <img
+                                src={entry.user.avatar || DefaultUser}
+                                alt="User"
+                              />
+                            </a>
                           </div>
-                          <p className="text-sm">{entry.user.username}</p>
+                          <a
+                            href="#"
+                            className="text-sm hover:text-blue-500"
+                            onClick={() => handleViewUserSchedule(index)}
+                          >
+                            {entry.user.username}
+                          </a>
                         </div>
                       </td>
                       <td className="border-stroke p-2.5 text-center dark:border-strokedark">
@@ -390,7 +406,7 @@ const ScheduleStats: React.FC = () => {
                         className="border-l border-r border-stroke dark:border-strokedark"
                       >
                         <div className="grid min-w-max grid-cols-4">
-                          <div className="col-span-2 flex items-center gap-2 border-r border-stroke p-2.5 dark:border-strokedark">
+                          <div className="col-span-2 flex items-center justify-center gap-2 border-r border-stroke p-2.5 dark:border-strokedark">
                             <div className="flex items-center gap-2">
                               <span className="text-sm">
                                 {entry.scheduleInfo.plannedStart}
@@ -626,12 +642,12 @@ const ScheduleStats: React.FC = () => {
                             </svg>
                           </button>
                           {/** View button */}
-                          <button
+                          {/* <button
                             className="ml-2 inline-flex items-center gap-2 rounded bg-primary px-2 py-2 font-medium text-white hover:bg-opacity-90"
                             onClick={() => handleViewUserSchedule(index)}
                           >
                             <EyeIcon className="h-5 w-5" />
-                          </button>
+                          </button> */}
                         </div>
                       </td>
                     </tr>
