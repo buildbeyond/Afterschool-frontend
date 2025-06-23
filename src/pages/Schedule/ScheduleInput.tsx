@@ -1,26 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import ScheduleTable from '../Tables/ScheduleTable';
-import { ScheduleEntry } from '../Tables/ScheduleTable';
 import DefaultLayout from '../../layout/DefaultLayout';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
 import { scheduleApi } from '../../services/api';
 import { toast } from 'react-toastify';
+import DatePickerJp from '../../components/Forms/DatePicker/DatePickerJp';
+import { ParentScheduleEntry } from '../../types';
 
 const ScheduleInput: React.FC = () => {
-  const [scheduleData, setScheduleData] = useState<ScheduleEntry[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [scheduleData, setScheduleData] = useState<ParentScheduleEntry[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  // Get current month and year
-  const currentDate = new Date();
-  const currentMonth = currentDate.getMonth() + 1 + '';
-  const currentYear = currentDate.getFullYear() + '';
-
-  const handleScheduleChange = (newSchedule: ScheduleEntry[]) => {
+  const handleScheduleChange = (newSchedule: ParentScheduleEntry[]) => {
     setScheduleData(newSchedule);
   };
 
   // Generate days for the current month
   const generateDaysForCurrentMonth = () => {
+    const currentMonth = selectedDate.getMonth() + 1 + '';
+    const currentYear = selectedDate.getFullYear() + '';
     const year = parseInt(currentYear);
     const month = parseInt(currentMonth) - 1; // JS months are 0-indexed
     const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -55,6 +54,8 @@ const ScheduleInput: React.FC = () => {
       setIsLoading(true);
       // Always generate the full month of days first
       const allDays = generateDaysForCurrentMonth();
+      const currentMonth = selectedDate.getMonth() + 1 + '';
+      const currentYear = selectedDate.getFullYear() + '';
 
       try {
         const response = await scheduleApi.getSchedule(
@@ -100,6 +101,8 @@ const ScheduleInput: React.FC = () => {
 
   const handleSubmit = async () => {
     try {
+      const currentMonth = selectedDate.getMonth() + 1 + '';
+      const currentYear = selectedDate.getFullYear() + '';
       setIsLoading(true);
       await scheduleApi.submitSchedule({
         month: currentMonth,
@@ -117,7 +120,7 @@ const ScheduleInput: React.FC = () => {
 
   useEffect(() => {
     loadSchedule();
-  }, []);
+  }, [selectedDate]);
 
   return (
     <DefaultLayout>
@@ -126,9 +129,16 @@ const ScheduleInput: React.FC = () => {
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="border-b border-stroke px-6.5 py-4 dark:border-strokedark">
           <div className="flex justify-between">
-            <h3 className="font-medium text-black dark:text-white">
-              {currentYear}年{currentMonth}月のスケジュール
-            </h3>
+            <div className="flex items-center gap-x-4">
+              <DatePickerJp
+                selectedDate={selectedDate}
+                onDateChange={setSelectedDate}
+                isMonthSelector={true}
+              />
+              <h3 className="font-medium text-black dark:text-white">
+                スケジュール
+              </h3>
+            </div>
             <button
               type="button"
               disabled={isLoading}

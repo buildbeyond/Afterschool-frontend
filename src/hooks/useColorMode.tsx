@@ -9,8 +9,14 @@ const useColorMode = () => {
     const bodyClass = window.document.body.classList;
 
     colorMode === 'dark'
-      ? bodyClass.add(className)
-      : bodyClass.remove(className);
+      ? (bodyClass.add(className),
+        document.querySelectorAll('.flatpickr-calendar').forEach((e) => {
+          e.classList.add('flatpickr-monthSelect-theme-dark');
+        }))
+      : (bodyClass.remove(className),
+        document.querySelectorAll('.flatpickr-calendar').forEach((e) => {
+          e.classList.remove('flatpickr-monthSelect-theme-dark');
+        }));
   }, [colorMode]);
 
   return [colorMode, setColorMode];

@@ -2,11 +2,19 @@ import React, { useEffect, useRef, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import SidebarLinkGroup from './SidebarLinkGroup';
 import Logo from '../../images/logo/logo.svg';
+import DefaultUser from '../../images/user/default.png';
 import { useAuth } from '../../hooks/useAuth';
+import { scheduleApi } from '../../services/api';
 
 interface SidebarProps {
   sidebarOpen: boolean;
   setSidebarOpen: (arg: boolean) => void;
+}
+
+interface Parent {
+  _id: string;
+  username: string;
+  avatar: string;
 }
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
@@ -16,6 +24,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
   const trigger = useRef<any>(null);
   const sidebar = useRef<any>(null);
+  const [parents, setParents] = useState<Parent[]>([]);
 
   const storedSidebarExpanded = localStorage.getItem('sidebar-expanded');
   const [sidebarExpanded, setSidebarExpanded] = useState(
@@ -57,6 +66,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     }
   }, [sidebarExpanded]);
 
+  useEffect(() => {
+    if (user.role == 'coach') {
+      scheduleApi.fetchAllParents().then(({ parents }) => {
+        setParents(parents);
+      });
+    }
+  }, []);
+
   return (
     <aside
       ref={sidebar}
@@ -66,10 +83,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     >
       {/* <!-- SIDEBAR HEADER --> */}
       <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
-        <NavLink to="/">
-          <img src={Logo} alt="Logo" />
-        </NavLink>
-
         <button
           ref={trigger}
           onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -107,7 +120,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               {/** <!-- Menu Item Schedule --> */}
               <SidebarLinkGroup
                 activeCondition={
-                  pathname === '/schedule' || pathname.includes('schedule')
+                  pathname === '/schedule' ||
+                  pathname.includes('schedule/stats') ||
+                  pathname.includes('schedule/input')
                 }
               >
                 {(handleClick, open) => {
@@ -117,7 +132,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         to="#"
                         className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
                           (pathname === '/schedule' ||
-                            pathname.includes('schedule')) &&
+                            pathname.includes('schedule/stats') ||
+                            pathname.includes('schedule/input')) &&
                           'bg-graydark dark:bg-meta-4'
                         }`}
                         onClick={(e) => {
@@ -201,6 +217,105 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                   );
                 }}
               </SidebarLinkGroup>
+              {/** <!-- Menu Item Schedule --> */}
+              {/** <!-- Menu Item Schedule --> */}
+              {user?.role === 'coach' && (
+                <SidebarLinkGroup
+                  activeCondition={
+                    pathname.includes('schedule') &&
+                    !pathname.includes('schedule/stats') &&
+                    !pathname.includes('schedule/input')
+                  }
+                >
+                  {(handleClick, open) => {
+                    return (
+                      <React.Fragment>
+                        <NavLink
+                          to="#"
+                          className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                            pathname === '/schedule/:userId' &&
+                            !pathname.includes('schedule/stats') &&
+                            !pathname.includes('schedule/input') &&
+                            'bg-graydark dark:bg-meta-4'
+                          }`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            sidebarExpanded
+                              ? handleClick()
+                              : setSidebarExpanded(true);
+                          }}
+                        >
+                          {' '}
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth={1.5}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="h-6 w-6"
+                          >
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                          </svg>
+                          Users
+                          <svg
+                            className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${
+                              open && 'rotate-180'
+                            }`}
+                            width="20"
+                            height="20"
+                            viewBox="0 0 20 20"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              clipRule="evenodd"
+                              d="M4.41107 6.9107C4.73651 6.58527 5.26414 6.58527 5.58958 6.9107L10.0003 11.3214L14.4111 6.91071C14.7365 6.58527 15.2641 6.58527 15.5896 6.91071C15.915 7.23614 15.915 7.76378 15.5896 8.08922L10.5896 13.0892C10.2641 13.4147 9.73651 13.4147 9.41107 13.0892L4.41107 8.08922C4.08563 7.76378 4.08563 7.23614 4.41107 6.9107Z"
+                              fill=""
+                            />
+                          </svg>
+                        </NavLink>
+                        {/* <!-- Dropdown Menu Start --> */}
+                        <div
+                          className={`translate transform overflow-hidden ${
+                            !open && 'hidden'
+                          }`}
+                        >
+                          <ul className="mb-5.5 mt-4 flex flex-col gap-2.5 pl-6">
+                            {parents.map((parent) => (
+                              <li>
+                                <NavLink
+                                  to={`/schedule/${parent._id}`}
+                                  className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                                    pathname.includes(
+                                      `schedule/${parent._id}`
+                                    ) && 'bg-graydark dark:bg-meta-4'
+                                  }`}
+                                >
+                                  <img
+                                    src={
+                                      parent.avatar
+                                        ? parent.avatar
+                                        : DefaultUser
+                                    }
+                                    className="h-10 w-10 rounded-full"
+                                  />
+                                  {parent.username}
+                                </NavLink>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        {/* <!-- Dropdown Menu End --> */}
+                      </React.Fragment>
+                    );
+                  }}
+                </SidebarLinkGroup>
+              )}
               {/** <!-- Menu Item Schedule --> */}
             </ul>
             <ul className="mb-6 flex flex-col gap-1.5">

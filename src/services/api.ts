@@ -1,6 +1,11 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { ILoginInput, IRegisterInput, ParentScheduleData } from '../types';
+import {
+  ILoginInput,
+  IRegisterInput,
+  ParentScheduleData,
+  ParentScheduleEntry,
+} from '../types';
 import { ScheduleEntry } from '../pages/Tables/ScheduleTable';
 
 const api = axios.create({
@@ -59,6 +64,11 @@ export interface ScheduleData {
 }
 
 export const scheduleApi = {
+  fetchAllParents: async () => {
+    const response = await api.get('/all-parents');
+    return response.data;
+  },
+
   submitSchedule: async (scheduleData: ScheduleData) => {
     const response = await api.post(`/schedule`, scheduleData);
     return response.data;
@@ -77,12 +87,14 @@ export const scheduleApi = {
   },
 
   submitScheduleStats: async (
-    month: string,
-    day: string,
+    scheduleData: ParentScheduleData[] | ParentScheduleEntry[],
+    userId: string = '',
     year: string,
-    scheduleData: ParentScheduleData[]
+    month: string,
+    day?: string
   ) => {
     const response = await api.post(`/schedule/stats`, {
+      userId,
       month,
       day,
       year,
