@@ -36,7 +36,7 @@ const SelectWithInput: React.FC<SelectWithInputProps> = ({
   };
 
   return (
-    <div className="relative inline-block w-20" ref={wrapperRef} title={value}>
+    <div className="relative inline-block w-24" ref={wrapperRef} title={value}>
       <button
         onClick={() => setOpen(!open)}
         className="w-full truncate rounded border border-slate-300 bg-transparent p-1 text-left shadow focus:outline-none dark:border-slate-700"

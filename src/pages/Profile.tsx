@@ -28,6 +28,7 @@ const Profile = () => {
     attendance: { start: string; end: string }[];
     holiday: { start: string; end: string }[];
   }>(user.serviceSlot);
+  const [userName, setUserName] = useState<string>(user.username);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -54,6 +55,7 @@ const Profile = () => {
         businessNumbers,
         guardianName,
         serviceSlot,
+        username: userName,
       };
 
       // Call your API to save the profile data
@@ -121,9 +123,17 @@ const Profile = () => {
             </div>
           </div>
           <div className="mt-4">
-            <h3 className="mb-1.5 text-2xl font-semibold text-black dark:text-white">
-              {user.username}
-            </h3>
+            <div className="flex items-center justify-center">
+              <h3 className="mb-1.5 text-2xl font-semibold text-black dark:text-white">
+                <input
+                  type="text"
+                  className="mt-1 block w-full rounded-md border border-stroke bg-white p-2 text-center dark:border-strokedark dark:bg-boxdark"
+                  placeholder="保護者の名前を入力"
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
+                />
+              </h3>
+            </div>
             <p className="font-medium">
               {user.role === UserRole.PARENT ? '保護者' : 'コーチ'}
             </p>

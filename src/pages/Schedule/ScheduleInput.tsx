@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import ScheduleTable from '../Tables/ScheduleTable';
-import { ScheduleEntry } from '../Tables/ScheduleTable';
 import DefaultLayout from '../../layout/DefaultLayout';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
 import { scheduleApi } from '../../services/api';
 import { toast } from 'react-toastify';
 import DatePickerJp from '../../components/Forms/DatePicker/DatePickerJp';
+import { ParentScheduleEntry } from '../../types';
 
 const ScheduleInput: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [scheduleData, setScheduleData] = useState<ScheduleEntry[]>([]);
+  const [scheduleData, setScheduleData] = useState<ParentScheduleEntry[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const handleScheduleChange = (newSchedule: ScheduleEntry[]) => {
+  const handleScheduleChange = (newSchedule: ParentScheduleEntry[]) => {
     setScheduleData(newSchedule);
   };
 

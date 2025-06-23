@@ -1,12 +1,82 @@
 import React, { useState, useEffect } from 'react';
 import ScheduleTable from '../Tables/ScheduleTable';
-import { ScheduleEntry } from '../Tables/ScheduleTable';
 import DefaultLayout from '../../layout/DefaultLayout';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
 import { scheduleApi } from '../../services/api';
 import { toast } from 'react-toastify';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import DatePickerJp from '../../components/Forms/DatePicker/DatePickerJp';
+import { ParentScheduleEntry } from '../../types';
+
+const premiumOptions: {
+  label: string;
+  type?: 'checkbox' | 'dropdown';
+  options?: { value: string; label: string }[];
+  value: keyof ParentScheduleEntry;
+}[] = [
+  {
+    label: '提供形態',
+    value: 'supportType',
+    type: 'dropdown',
+    options: [
+      { value: '1', label: '1' },
+      { value: '2', label: '2' },
+    ],
+  },
+  {
+    label: '家族支援加算',
+    value: 'familySupport',
+    type: 'dropdown',
+    options: [
+      { value: '1', label: '1' },
+      { value: '2', label: '2' },
+      { value: '3', label: '3' },
+      { value: '4', label: '4' },
+    ],
+  },
+  {
+    label: '医療連携体制加算',
+    value: 'medicalSupport',
+  },
+  {
+    label: '延長支援加算',
+    value: 'extendedSupport',
+    type: 'dropdown',
+    options: [
+      { value: '1', label: '1' },
+      { value: '2', label: '2' },
+      { value: '3', label: '3' },
+    ],
+  },
+  {
+    label: '集中的支援加算',
+    value: 'concentratedSupport',
+  },
+  {
+    label: '専門的支援加算（支援実施時）',
+    value: 'specializedSupport',
+  },
+  {
+    label: '通所自立支援加算',
+    value: 'communitySupport',
+  },
+  {
+    label: '入浴支援加算',
+    value: 'bathSupport',
+  },
+  {
+    label: '子育てサポート加算',
+    value: 'childCareSupport',
+  },
+  {
+    label: '自立サポート加算',
+    value: 'selfSupport',
+  },
+  {
+    label: '保護者等確認欄',
+    value: 'guardianConfirmation',
+  },
+];
 
 const ScheduleIndividual: React.FC = () => {
   const { userId } = useParams();
@@ -21,12 +91,13 @@ const ScheduleIndividual: React.FC = () => {
   }
 
   const [selectedDate, setSelectedDate] = useState<Date>(currentDate);
-  const [scheduleData, setScheduleData] = useState<ScheduleEntry[]>([]);
+  const [scheduleData, setScheduleData] = useState<ParentScheduleEntry[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [currentUser, setCurrentUser] = useState<string>('');
+
   const navigate = useNavigate();
 
-  const handleScheduleChange = (newSchedule: ScheduleEntry[]) => {
+  const handleScheduleChange = (newSchedule: ParentScheduleEntry[]) => {
     setScheduleData(newSchedule);
   };
 
@@ -119,6 +190,42 @@ const ScheduleIndividual: React.FC = () => {
     setScheduleData(generateDaysForCurrentMonth());
   }, []);
 
+  const handleSubmit = async () => {
+    try {
+      setIsLoading(true);
+      const month = (selectedDate.getMonth() + 1).toString();
+      const year = selectedDate.getFullYear().toString();
+      await scheduleApi.submitScheduleStats(scheduleData, userId, year, month);
+      toast.success('スケジュール提出成功');
+    } catch (error) {
+      console.error('スケジュール提出エラー:', error);
+      toast.error('スケジュール提出に失敗しました');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDownload = async (e) => {
+    e.preventDefault();
+    try {
+      setIsLoading(true);
+      const month = (selectedDate.getMonth() + 1).toString();
+      const year = selectedDate.getFullYear().toString();
+      const user = userId;
+      const data = await scheduleApi.downloadReportData(month, year, user);
+      const url = window.URL.createObjectURL(new Blob([data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `実績-${currentUser}.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch {
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     loadSchedule();
   }, [selectedDate, userId]);
@@ -128,7 +235,7 @@ const ScheduleIndividual: React.FC = () => {
       <Breadcrumb pageName="スケジュール入力" />
 
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-        <div className="border-b border-stroke px-6.5 py-4 dark:border-strokedark">
+        <div className="flex justify-between border-b border-stroke px-6.5 py-4 dark:border-strokedark">
           <div className="flex items-center gap-2">
             <button
               className="flex h-6 w-6 items-center justify-center rounded-full border border-slate-400 p-1 text-base text-slate-400"
@@ -158,6 +265,39 @@ const ScheduleIndividual: React.FC = () => {
               </h3>
             </div>
           </div>
+          <div className="flex items-center gap-2">
+            {/** Submit button */}
+            <button
+              type="button"
+              disabled={isLoading}
+              onClick={handleSubmit}
+              className="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              入力反映
+            </button>
+            <button
+              className="inline-flex items-center gap-2 rounded bg-primary px-2 py-2 font-medium text-white hover:bg-opacity-90"
+              onClick={handleDownload}
+            >
+              <svg
+                className="fill-current"
+                width="18"
+                height="18"
+                viewBox="0 0 18 18"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M9 12.75L13.5 8.25H10.5V1.5H7.5V8.25H4.5L9 12.75Z"
+                  fill="currentColor"
+                />
+                <path
+                  d="M1.5 15.75H16.5V12.75H15V14.25H3V12.75H1.5V15.75Z"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
 
         <div className="p-6.5">
@@ -170,7 +310,6 @@ const ScheduleIndividual: React.FC = () => {
               <ScheduleTable
                 scheduleData={scheduleData}
                 onChange={handleScheduleChange}
-                disabled={true}
                 showAchievements
               />
             </>
