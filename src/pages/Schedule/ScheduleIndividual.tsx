@@ -119,7 +119,6 @@ const ScheduleIndividual: React.FC = () => {
         date: i.toString(),
         day: dayNames[dayOfWeek],
         isHoliday: false,
-        beAbsent: false,
         plannedStart: '',
         plannedEnd: '',
         plannedPickup: false,

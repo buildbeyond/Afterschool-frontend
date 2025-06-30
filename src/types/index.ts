@@ -37,7 +37,7 @@ export interface ParentScheduleEntry {
   date?: string;
   day?: string;
   isHoliday?: boolean;
-  beAbsent?: boolean;
+  wasPresent?: boolean;
   wasAbsent?: boolean;
   plannedStart: string;
   plannedEnd: string;

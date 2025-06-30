@@ -145,8 +145,24 @@ const Profile = () => {
               </div>
             </div>
 
+            {/* New Field for Parents */}
+            {user.role === UserRole.PARENT && (
+              <div className="mb-4 flex flex-col items-center md:flex-row">
+                <label className="block min-w-32 text-sm font-medium">
+                  保護者の名前
+                </label>
+                <input
+                  type="text"
+                  className="mt-1 block w-full rounded-md border border-stroke bg-white p-2 dark:border-strokedark dark:bg-boxdark"
+                  placeholder="保護者の名前を入力"
+                  value={guardianName}
+                  onChange={(e) => setGuardianName(e.target.value)}
+                />
+              </div>
+            )}
+
             {/* New Fields for Coaches */}
-            {user.role === UserRole.COACH && (
+            {user.role === UserRole.PARENT && (
               <div className="w-md mx-auto mt-4">
                 <h4 className="text-lg font-semibold">コーチ情報</h4>
                 <div className="flex flex-col justify-evenly gap-3 md:flex-row">
@@ -194,7 +210,7 @@ const Profile = () => {
               </div>
             )}
             {/* New Fields for Coaches */}
-            {user.role === UserRole.COACH && (
+            {user.role === UserRole.PARENT && (
               <div className="mt-4">
                 <div className="mb-4">
                   <h5 className="text-md font-semibold">
@@ -640,22 +656,6 @@ const Profile = () => {
                     </tbody>
                   </table>
                 </div>
-              </div>
-            )}
-
-            {/* New Field for Parents */}
-            {user.role === UserRole.PARENT && (
-              <div className="mb-4 flex flex-col items-center md:flex-row">
-                <label className="block min-w-32 text-sm font-medium">
-                  保護者の名前
-                </label>
-                <input
-                  type="text"
-                  className="mt-1 block w-full rounded-md border border-stroke bg-white p-2 dark:border-strokedark dark:bg-boxdark"
-                  placeholder="保護者の名前を入力"
-                  value={guardianName}
-                  onChange={(e) => setGuardianName(e.target.value)}
-                />
               </div>
             )}
           </div>

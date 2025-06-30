@@ -33,6 +33,8 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
     newScheduleData[index] = {
       ...newScheduleData[index],
       [field]: value,
+      ...(field === 'wasPresent' && { wasAbsent: false }),
+      ...(field === 'wasAbsent' && { wasPresent: false }),
     };
     onChange(newScheduleData);
   };
@@ -122,348 +124,354 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
           </tr>
         </thead>
         <tbody className="divide-y divide-stroke dark:divide-strokedark">
-          {scheduleData.map((entry, index) => (
-            <tr
-              key={index}
-              className={`${
-                entry.day === '土'
-                  ? 'bg-blue-50 dark:bg-blue-900/10'
-                  : entry.day === '日'
-                  ? 'bg-pink-50 dark:bg-pink-900/10'
-                  : 'bg-white dark:bg-boxdark'
-              }`}
-            >
-              <td className="p-2.5 text-center">
-                <span className="text-sm">
-                  {entry.date}({entry.day})
-                </span>
-              </td>
-              <td className="border-stroke p-2.5 text-center dark:border-strokedark">
-                <div className="flex min-w-max items-center justify-center">
-                  {disabled ? (
-                    entry.isHoliday && <CheckMark />
-                  ) : (
-                    <input
-                      type="checkbox"
-                      checked={entry.isHoliday}
-                      onChange={(e) =>
-                        handleInputChange(index, 'isHoliday', e.target.checked)
-                      }
-                      className="h-4 w-4"
-                    />
-                  )}
-                </div>
-              </td>
-              {showAchievements && (
-                <>
-                  <td className="border-stroke p-2.5 text-center dark:border-strokedark">
-                    <div className="flex min-w-max items-center justify-center">
-                      <input
-                        type="checkbox"
-                        checked={!entry.wasAbsent}
-                        onChange={(e) =>
-                          handleInputChange(
-                            index,
-                            'wasAbsent',
-                            !e.target.checked
-                          )
-                        }
-                        className="h-4 w-4"
-                      />
-                    </div>
-                  </td>
-                  <td className="border-stroke p-2.5 text-center dark:border-strokedark">
-                    <div className="flex min-w-max items-center justify-center">
-                      <input
-                        type="checkbox"
-                        checked={entry.wasAbsent}
-                        onChange={(e) =>
-                          handleInputChange(
-                            index,
-                            'wasAbsent',
-                            e.target.checked
-                          )
-                        }
-                        className="h-4 w-4"
-                      />
-                    </div>
-                  </td>
-                </>
-              )}
-              <td
-                colSpan={4}
-                className="border-l border-r border-stroke dark:border-strokedark"
+          {scheduleData.map((entry, index) => {
+            const isRowDisabled = entry.wasAbsent || entry.isHoliday;
+            return (
+              <tr
+                key={index}
+                className={`${
+                  entry.day === '土'
+                    ? 'bg-blue-50 dark:bg-blue-900/10'
+                    : entry.day === '日'
+                    ? 'bg-pink-50 dark:bg-pink-900/10'
+                    : 'bg-white dark:bg-boxdark'
+                }`}
               >
-                <div className="grid min-w-max grid-cols-4">
-                  <div className="col-span-2 flex items-center justify-center gap-2 border-r border-stroke p-2.5 dark:border-strokedark">
-                    {!entry.wasAbsent ? (
-                      <input
-                        type="time"
-                        value={entry.plannedStart}
-                        onChange={(e) =>
-                          handleTimeChange(
-                            index,
-                            'plannedStart',
-                            e.target.value
-                          )
-                        }
-                        className="h-10 w-25 rounded border border-stroke bg-transparent px-2 dark:border-strokedark [&::-webkit-calendar-picker-indicator]:hidden"
-                        disabled={disabled}
-                      />
-                    ) : (
-                      <input
-                        type="time"
-                        value=""
-                        className="h-10 w-25 rounded border border-stroke bg-transparent px-2 dark:border-strokedark [&::-webkit-calendar-picker-indicator]:hidden"
-                        disabled
-                      />
-                    )}
-                    <span>-</span>
-                    {!entry.wasAbsent ? (
-                      <input
-                        type="time"
-                        value={entry.plannedEnd}
-                        onChange={(e) =>
-                          handleTimeChange(index, 'plannedEnd', e.target.value)
-                        }
-                        className="h-10 w-25 rounded border border-stroke bg-transparent px-2 dark:border-strokedark [&::-webkit-calendar-picker-indicator]:hidden"
-                        disabled={disabled}
-                      />
-                    ) : (
-                      <input
-                        type="time"
-                        value=""
-                        className="h-10 w-25 rounded border border-stroke bg-transparent px-2 dark:border-strokedark [&::-webkit-calendar-picker-indicator]:hidden"
-                        disabled
-                      />
-                    )}
-                  </div>
-                  <div className="flex flex-row items-center justify-center gap-2 px-2">
+                <td className="p-2.5 text-center">
+                  <span className="text-sm">
+                    {entry.date}({entry.day})
+                  </span>
+                </td>
+                <td className="border-stroke p-2.5 text-center dark:border-strokedark">
+                  <div className="flex min-w-max items-center justify-center">
                     {disabled ? (
-                      entry.plannedPickup ? (
-                        <CheckMark />
-                      ) : (
-                        <div className="min-w-[25px]"></div>
-                      )
-                    ) : !entry.wasAbsent ? (
+                      entry.isHoliday && <CheckMark />
+                    ) : (
                       <input
                         type="checkbox"
-                        checked={entry.plannedPickup}
+                        checked={entry.isHoliday}
                         onChange={(e) =>
                           handleInputChange(
                             index,
-                            'plannedPickup',
+                            'isHoliday',
                             e.target.checked
                           )
                         }
                         className="h-4 w-4"
                       />
-                    ) : (
-                      <input
-                        type="checkbox"
-                        checked={false}
-                        className="h-4 w-4"
-                        disabled
-                      />
-                    )}
-                    {disabled ? (
-                      <input
-                        type="input"
-                        title={entry.plannedPickupLocation}
-                        value={entry.plannedPickupLocation}
-                        className="w-20 rounded border border-stroke bg-transparent px-1 py-0.5 text-sm dark:border-strokedark"
-                        disabled
-                      />
-                    ) : !entry.wasAbsent ? (
-                      <SelectWithInput
-                        options={locationOptions.map((v) => v)}
-                        value={entry.plannedPickupLocation}
-                        onChange={(v) => {
-                          handleInputChange(index, 'plannedPickupLocation', v);
-                        }}
-                      />
-                    ) : (
-                      <input
-                        type="input"
-                        value=""
-                        className="w-24 rounded border border-stroke bg-transparent px-1 py-0.5 text-sm dark:border-strokedark"
-                        disabled
-                      />
                     )}
                   </div>
-                  <div className="flex flex-row items-center justify-center gap-2 px-2">
-                    {disabled ? (
-                      entry.plannedReturn ? (
-                        <CheckMark />
-                      ) : (
-                        <div className="min-w-[25px]"></div>
-                      )
-                    ) : !entry.wasAbsent ? (
-                      <input
-                        type="checkbox"
-                        checked={entry.plannedReturn}
-                        onChange={(e) =>
-                          handleInputChange(
-                            index,
-                            'plannedReturn',
-                            e.target.checked
-                          )
-                        }
-                        className="h-4 w-4"
-                      />
-                    ) : (
-                      <input
-                        type="checkbox"
-                        checked={false}
-                        className="h-4 w-4"
-                        disabled
-                      />
-                    )}
-                    {disabled ? (
-                      <input
-                        type="input"
-                        title={entry.plannedReturnLocation}
-                        value={entry.plannedReturnLocation}
-                        disabled
-                        className="w-20 rounded border border-stroke bg-transparent px-1 py-0.5 text-sm dark:border-strokedark"
-                      />
-                    ) : !entry.wasAbsent ? (
-                      <SelectWithInput
-                        options={locationOptions.map((v) => v)}
-                        value={entry.plannedReturnLocation}
-                        onChange={(v) => {
-                          handleInputChange(index, 'plannedReturnLocation', v);
-                        }}
-                      />
-                    ) : (
-                      <input
-                        type="input"
-                        value=""
-                        className="w-24 rounded border border-stroke bg-transparent px-1 py-0.5 text-sm dark:border-strokedark"
-                        disabled
-                      />
-                    )}
-                  </div>
-                </div>
-              </td>
-              {showAchievements && (
-                <td
-                  colSpan={2}
-                  className="border-l border-r border-stroke dark:border-strokedark"
-                >
-                  <div className="grid min-w-max grid-cols-2">
-                    <div className="col-span-2 flex items-center justify-center gap-2 p-2.5">
-                      <div className="flex items-center gap-2">
-                        {!entry.wasAbsent ? (
+                </td>
+                {showAchievements && (
+                  <>
+                    <td className="border-stroke p-2.5 text-center dark:border-strokedark">
+                      <div className="flex min-w-max items-center justify-center">
+                        {!entry.isHoliday ? (
                           <input
-                            type="time"
-                            value={entry.actualStart}
+                            type="checkbox"
+                            checked={entry.wasPresent}
                             onChange={(e) =>
-                              handleTimeChange(
-                                index,
-                                'actualStart',
-                                e.target.value
-                              )
-                            }
-                            className="w-23 rounded border border-stroke bg-transparent px-2 py-1 text-sm dark:border-strokedark [&::-webkit-calendar-picker-indicator]:hidden"
-                          />
-                        ) : (
-                          <input
-                            type="time"
-                            value=""
-                            className="w-23 rounded border border-stroke bg-transparent px-2 py-1 text-sm dark:border-strokedark [&::-webkit-calendar-picker-indicator]:hidden"
-                            disabled
-                          />
-                        )}
-                        <span>-</span>
-                        {!entry.wasAbsent ? (
-                          <input
-                            type="time"
-                            value={entry.actualEnd}
-                            onChange={(e) =>
-                              handleTimeChange(
-                                index,
-                                'actualEnd',
-                                e.target.value
-                              )
-                            }
-                            className="w-23 rounded border border-stroke bg-transparent px-2 py-1 text-sm dark:border-strokedark [&::-webkit-calendar-picker-indicator]:hidden"
-                          />
-                        ) : (
-                          <input
-                            type="time"
-                            value=""
-                            className="w-23 rounded border border-stroke bg-transparent px-2 py-1 text-sm dark:border-strokedark [&::-webkit-calendar-picker-indicator]:hidden"
-                            disabled
-                          />
-                        )}
-                        {!entry.wasAbsent ? (
-                          <select
-                            value={entry.actualAmount}
-                            onChange={(e) => {
                               handleInputChange(
                                 index,
-                                'actualAmount',
-                                e.target.value
-                              );
-                            }}
-                            className="ml-4 rounded border border-stroke bg-transparent px-2 py-1 dark:border-strokedark dark:bg-boxdark"
-                          >
-                            <option value="0">0</option>
-                            <option value="0.5">0.5</option>
-                            <option value="1.0">1.0</option>
-                            <option value="1.5">1.5</option>
-                            <option value="2.0">2.0</option>
-                            <option value="2.5">2.5</option>
-                            <option value="3.0">3.0</option>
-                            <option value="5.0">5.0</option>
-                          </select>
-                        ) : (
-                          <input
-                            type="input"
-                            value=""
-                            className="ml-4 w-15 rounded border border-stroke bg-transparent px-1 py-0.5 text-sm dark:border-strokedark"
-                            disabled
+                                'wasPresent',
+                                e.target.checked
+                              )
+                            }
+                            className="h-4 w-4"
                           />
+                        ) : (
+                          <input type="checkbox" disabled className="h-4 w-4" />
                         )}
                       </div>
+                    </td>
+                    <td className="border-stroke p-2.5 text-center dark:border-strokedark">
+                      <div className="flex min-w-max items-center justify-center">
+                        {!entry.isHoliday ? (
+                          <input
+                            type="checkbox"
+                            checked={entry.wasAbsent}
+                            onChange={(e) =>
+                              handleInputChange(
+                                index,
+                                'wasAbsent',
+                                e.target.checked
+                              )
+                            }
+                            className="h-4 w-4"
+                          />
+                        ) : (
+                          <input type="checkbox" disabled className="h-4 w-4" />
+                        )}
+                      </div>
+                    </td>
+                  </>
+                )}
+                <td
+                  colSpan={4}
+                  className="border-l border-r border-stroke dark:border-strokedark"
+                >
+                  <div className="grid min-w-max grid-cols-4">
+                    <div className="col-span-2 flex items-center justify-center gap-2 border-r border-stroke p-2.5 dark:border-strokedark">
+                      {!isRowDisabled ? (
+                        <input
+                          type="time"
+                          value={entry.plannedStart}
+                          onChange={(e) =>
+                            handleTimeChange(
+                              index,
+                              'plannedStart',
+                              e.target.value
+                            )
+                          }
+                          className="h-10 w-25 rounded border border-stroke bg-transparent px-2 dark:border-strokedark [&::-webkit-calendar-picker-indicator]:hidden"
+                          disabled={disabled}
+                        />
+                      ) : (
+                        <input
+                          type="time"
+                          value=""
+                          className="h-10 w-25 rounded border border-stroke bg-transparent px-2 dark:border-strokedark [&::-webkit-calendar-picker-indicator]:hidden"
+                          disabled
+                        />
+                      )}
+                      <span>-</span>
+                      {!isRowDisabled ? (
+                        <input
+                          type="time"
+                          value={entry.plannedEnd}
+                          onChange={(e) =>
+                            handleTimeChange(
+                              index,
+                              'plannedEnd',
+                              e.target.value
+                            )
+                          }
+                          className="h-10 w-25 rounded border border-stroke bg-transparent px-2 dark:border-strokedark [&::-webkit-calendar-picker-indicator]:hidden"
+                          disabled={disabled}
+                        />
+                      ) : (
+                        <input
+                          type="time"
+                          value=""
+                          className="h-10 w-25 rounded border border-stroke bg-transparent px-2 dark:border-strokedark [&::-webkit-calendar-picker-indicator]:hidden"
+                          disabled
+                        />
+                      )}
+                    </div>
+                    <div className="flex flex-row items-center justify-center gap-2 px-2">
+                      {disabled ? (
+                        entry.plannedPickup ? (
+                          <CheckMark />
+                        ) : (
+                          <div className="min-w-[25px]"></div>
+                        )
+                      ) : !isRowDisabled ? (
+                        <input
+                          type="checkbox"
+                          checked={entry.plannedPickup}
+                          onChange={(e) =>
+                            handleInputChange(
+                              index,
+                              'plannedPickup',
+                              e.target.checked
+                            )
+                          }
+                          className="h-4 w-4"
+                        />
+                      ) : (
+                        <input
+                          type="checkbox"
+                          checked={false}
+                          className="h-4 w-4"
+                          disabled
+                        />
+                      )}
+                      {disabled ? (
+                        <input
+                          type="input"
+                          title={entry.plannedPickupLocation}
+                          value={entry.plannedPickupLocation}
+                          className="w-20 rounded border border-stroke bg-transparent px-1 py-0.5 text-sm dark:border-strokedark"
+                          disabled
+                        />
+                      ) : !isRowDisabled ? (
+                        <SelectWithInput
+                          options={locationOptions.map((v) => v)}
+                          value={entry.plannedPickupLocation}
+                          onChange={(v) => {
+                            handleInputChange(
+                              index,
+                              'plannedPickupLocation',
+                              v
+                            );
+                          }}
+                        />
+                      ) : (
+                        <input
+                          type="input"
+                          value=""
+                          className="w-24 rounded border border-stroke bg-transparent px-1 py-0.5 text-sm dark:border-strokedark"
+                          disabled
+                        />
+                      )}
+                    </div>
+                    <div className="flex flex-row items-center justify-center gap-2 px-2">
+                      {disabled ? (
+                        entry.plannedReturn ? (
+                          <CheckMark />
+                        ) : (
+                          <div className="min-w-[25px]"></div>
+                        )
+                      ) : !isRowDisabled ? (
+                        <input
+                          type="checkbox"
+                          checked={entry.plannedReturn}
+                          onChange={(e) =>
+                            handleInputChange(
+                              index,
+                              'plannedReturn',
+                              e.target.checked
+                            )
+                          }
+                          className="h-4 w-4"
+                        />
+                      ) : (
+                        <input
+                          type="checkbox"
+                          checked={false}
+                          className="h-4 w-4"
+                          disabled
+                        />
+                      )}
+                      {disabled ? (
+                        <input
+                          type="input"
+                          title={entry.plannedReturnLocation}
+                          value={entry.plannedReturnLocation}
+                          disabled
+                          className="w-20 rounded border border-stroke bg-transparent px-1 py-0.5 text-sm dark:border-strokedark"
+                        />
+                      ) : !isRowDisabled ? (
+                        <SelectWithInput
+                          options={locationOptions.map((v) => v)}
+                          value={entry.plannedReturnLocation}
+                          onChange={(v) => {
+                            handleInputChange(
+                              index,
+                              'plannedReturnLocation',
+                              v
+                            );
+                          }}
+                        />
+                      ) : (
+                        <input
+                          type="input"
+                          value=""
+                          className="w-24 rounded border border-stroke bg-transparent px-1 py-0.5 text-sm dark:border-strokedark"
+                          disabled
+                        />
+                      )}
                     </div>
                   </div>
                 </td>
-              )}
-              <td className="p-2.5 text-center">
-                {disabled ? (
-                  entry.additionalUse && <CheckMark />
-                ) : !entry.wasAbsent ? (
-                  <input
-                    type="checkbox"
-                    checked={entry.additionalUse}
-                    onChange={(e) =>
-                      handleInputChange(
-                        index,
-                        'additionalUse',
-                        e.target.checked
-                      )
-                    }
-                    className="h-4 w-4"
-                  />
-                ) : (
-                  <input
-                    type="checkbox"
-                    checked={false}
-                    className="h-4 w-4"
-                    disabled
-                  />
+                {showAchievements && (
+                  <td
+                    colSpan={2}
+                    className="border-l border-r border-stroke dark:border-strokedark"
+                  >
+                    <div className="grid min-w-max grid-cols-2">
+                      <div className="col-span-2 flex items-center justify-center gap-2 p-2.5">
+                        <div className="flex items-center gap-2">
+                          {!isRowDisabled ? (
+                            <input
+                              type="time"
+                              value={entry.actualStart}
+                              onChange={(e) =>
+                                handleTimeChange(
+                                  index,
+                                  'actualStart',
+                                  e.target.value
+                                )
+                              }
+                              className="w-23 rounded border border-stroke bg-transparent px-2 py-1 text-sm dark:border-strokedark [&::-webkit-calendar-picker-indicator]:hidden"
+                            />
+                          ) : (
+                            <input
+                              type="time"
+                              value=""
+                              className="w-23 rounded border border-stroke bg-transparent px-2 py-1 text-sm dark:border-strokedark [&::-webkit-calendar-picker-indicator]:hidden"
+                              disabled
+                            />
+                          )}
+                          <span>-</span>
+                          {!isRowDisabled ? (
+                            <input
+                              type="time"
+                              value={entry.actualEnd}
+                              onChange={(e) =>
+                                handleTimeChange(
+                                  index,
+                                  'actualEnd',
+                                  e.target.value
+                                )
+                              }
+                              className="w-23 rounded border border-stroke bg-transparent px-2 py-1 text-sm dark:border-strokedark [&::-webkit-calendar-picker-indicator]:hidden"
+                            />
+                          ) : (
+                            <input
+                              type="time"
+                              value=""
+                              className="w-23 rounded border border-stroke bg-transparent px-2 py-1 text-sm dark:border-strokedark [&::-webkit-calendar-picker-indicator]:hidden"
+                              disabled
+                            />
+                          )}
+                          {!isRowDisabled ? (
+                            <select
+                              value={entry.actualAmount}
+                              onChange={(e) => {
+                                handleInputChange(
+                                  index,
+                                  'actualAmount',
+                                  e.target.value
+                                );
+                              }}
+                              className="ml-4 rounded border border-stroke bg-transparent px-2 py-1 dark:border-strokedark dark:bg-boxdark"
+                            >
+                              <option value="0">0</option>
+                              <option value="0.5">0.5</option>
+                              <option value="1.0">1.0</option>
+                              <option value="1.5">1.5</option>
+                              <option value="2.0">2.0</option>
+                              <option value="2.5">2.5</option>
+                              <option value="3.0">3.0</option>
+                              <option value="5.0">5.0</option>
+                            </select>
+                          ) : (
+                            <input
+                              type="input"
+                              value=""
+                              className="ml-4 w-15 rounded border border-stroke bg-transparent px-1 py-0.5 text-sm dark:border-strokedark"
+                              disabled
+                            />
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
                 )}
-              </td>
-              {showAchievements && (
                 <td className="p-2.5 text-center">
-                  {!entry.wasAbsent ? (
+                  {disabled ? (
+                    entry.additionalUse && <CheckMark />
+                  ) : !isRowDisabled ? (
                     <input
                       type="checkbox"
-                      checked={entry.hadSnack}
+                      checked={entry.additionalUse}
                       onChange={(e) =>
-                        handleInputChange(index, 'hadSnack', e.target.checked)
+                        handleInputChange(
+                          index,
+                          'additionalUse',
+                          e.target.checked
+                        )
                       }
                       className="h-4 w-4"
                     />
@@ -476,86 +484,106 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
                     />
                   )}
                 </td>
-              )}
-              <td className="p-2.5 text-center">
-                {disabled ? (
-                  entry.lunch && <CheckMark />
-                ) : !entry.wasAbsent ? (
-                  <input
-                    type="checkbox"
-                    checked={entry.lunch}
-                    onChange={(e) =>
-                      handleInputChange(index, 'lunch', e.target.checked)
-                    }
-                    className="h-4 w-4"
-                  />
-                ) : (
-                  <input
-                    type="checkbox"
-                    checked={false}
-                    className="h-4 w-4"
-                    disabled
-                  />
+                {showAchievements && (
+                  <td className="p-2.5 text-center">
+                    {!isRowDisabled ? (
+                      <input
+                        type="checkbox"
+                        checked={entry.hadSnack}
+                        onChange={(e) =>
+                          handleInputChange(index, 'hadSnack', e.target.checked)
+                        }
+                        className="h-4 w-4"
+                      />
+                    ) : (
+                      <input
+                        type="checkbox"
+                        checked={false}
+                        className="h-4 w-4"
+                        disabled
+                      />
+                    )}
+                  </td>
                 )}
-              </td>
-              <td className="border-r border-stroke p-2.5 text-center dark:border-strokedark">
-                {disabled ? (
-                  entry.dinner && <CheckMark />
-                ) : !entry.wasAbsent ? (
-                  <input
-                    type="checkbox"
-                    checked={entry.dinner}
-                    onChange={(e) =>
-                      handleInputChange(index, 'dinner', e.target.checked)
-                    }
-                    className="h-4 w-4"
-                  />
-                ) : (
-                  <input
-                    type="checkbox"
-                    checked={false}
-                    className="h-4 w-4"
-                    disabled
-                  />
-                )}
-              </td>
-              {showAchievements && (
-                <td className="border-stroke p-2.5 text-center dark:border-strokedark">
-                  <button
-                    className="bg-gray-200 min-w-max rounded-md px-4 py-2"
-                    onClick={() => {
-                      // Toggle dropdown for this entry
-                      setActiveDropdownIndex(
-                        activeDropdownIndex === index ? null : index
-                      );
-                    }}
-                    disabled={entry.wasAbsent}
-                  >
-                    選択
-                  </button>
+                <td className="p-2.5 text-center">
+                  {disabled ? (
+                    entry.lunch && <CheckMark />
+                  ) : !isRowDisabled ? (
+                    <input
+                      type="checkbox"
+                      checked={entry.lunch}
+                      onChange={(e) =>
+                        handleInputChange(index, 'lunch', e.target.checked)
+                      }
+                      className="h-4 w-4"
+                    />
+                  ) : (
+                    <input
+                      type="checkbox"
+                      checked={false}
+                      className="h-4 w-4"
+                      disabled
+                    />
+                  )}
                 </td>
-              )}
-
-              <td className="p-2.5">
-                {!entry.wasAbsent ? (
-                  <input
-                    type="text"
-                    value={entry.remarks || ''}
-                    onChange={(e) =>
-                      handleInputChange(index, 'remarks', e.target.value)
-                    }
-                    className="w-full min-w-24 rounded border border-stroke bg-transparent px-2 py-1 dark:border-strokedark"
-                  />
-                ) : (
-                  <input
-                    type="text"
-                    value=""
-                    className="w-full min-w-24 rounded border border-stroke bg-transparent px-2 py-1 dark:border-strokedark"
-                    disabled
-                  />
+                <td className="border-r border-stroke p-2.5 text-center dark:border-strokedark">
+                  {disabled ? (
+                    entry.dinner && <CheckMark />
+                  ) : !isRowDisabled ? (
+                    <input
+                      type="checkbox"
+                      checked={entry.dinner}
+                      onChange={(e) =>
+                        handleInputChange(index, 'dinner', e.target.checked)
+                      }
+                      className="h-4 w-4"
+                    />
+                  ) : (
+                    <input
+                      type="checkbox"
+                      checked={false}
+                      className="h-4 w-4"
+                      disabled
+                    />
+                  )}
+                </td>
+                {showAchievements && (
+                  <td className="border-stroke p-2.5 text-center dark:border-strokedark">
+                    <button
+                      className="bg-gray-200 min-w-max rounded-md px-4 py-2"
+                      onClick={() => {
+                        // Toggle dropdown for this entry
+                        setActiveDropdownIndex(
+                          activeDropdownIndex === index ? null : index
+                        );
+                      }}
+                      disabled={isRowDisabled}
+                    >
+                      選択
+                    </button>
+                  </td>
                 )}
-              </td>
-              {/* {showAchievements ? (
+
+                <td className="p-2.5">
+                  {!isRowDisabled ? (
+                    <input
+                      type="text"
+                      value={entry.remarks || ''}
+                      onChange={(e) =>
+                        handleInputChange(index, 'remarks', e.target.value)
+                      }
+                      className="w-full min-w-24 rounded border border-stroke bg-transparent px-2 py-1 dark:border-strokedark"
+                    />
+                  ) : (
+                    <input
+                      type="text"
+                      value=""
+                      className="w-full min-w-24 rounded border border-stroke bg-transparent px-2 py-1 dark:border-strokedark"
+                      disabled
+                    />
+                  )}
+                </td>
+                {/* {showAchievements ? (
                 <td className="p-2.5">
                   <input
                     type="text"
@@ -580,8 +608,9 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
                   />
                 </td>
               )} */}
-            </tr>
-          ))}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
       {activeDropdownIndex !== null && (
