@@ -34,7 +34,6 @@ const ScheduleInput: React.FC = () => {
         date: i.toString(),
         day: dayNames[dayOfWeek],
         isHoliday: dayOfWeek === 0 || dayOfWeek === 6, // Weekend
-        beAbsent: false,
         plannedStart: dayOfWeek >= 1 && dayOfWeek <= 5 ? '09:00' : '', // Weekday default
         plannedEnd: dayOfWeek >= 1 && dayOfWeek <= 5 ? '17:00' : '', // Weekday default
         plannedPickup: dayOfWeek >= 1 && dayOfWeek <= 5, // Weekday default
