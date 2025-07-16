@@ -77,8 +77,8 @@ const SignUp: React.FC = () => {
   };
 
   return (
-    <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-      <div className="flex flex-wrap items-center min-h-screen">
+    <div className="rounded-sm bg-white dark:border-strokedark dark:bg-boxdark">
+      <div className="flex min-h-screen flex-wrap items-center">
         <div className="hidden w-full xl:block xl:w-1/2">
           <div className="px-26 py-17.5 text-center">
             {/* <Link className="mb-5.5 inline-block" to="/">

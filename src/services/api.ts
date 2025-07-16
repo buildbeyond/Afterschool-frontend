@@ -33,6 +33,18 @@ export const authApi = {
   logout: () => {
     Cookies.remove('token');
   },
+
+  forgotPassword: async (email: string) => {
+    const response = await api.post(`/auth/forgot-password`, { email });
+    return response.data;
+  },
+
+  resetPassword: async (password: string, token: string) => {
+    const response = await api.post(`/auth/reset-password/${token}`, {
+      password,
+    });
+    return response.data;
+  },
 };
 
 export const uploadApi = {
