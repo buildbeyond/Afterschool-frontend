@@ -6,7 +6,6 @@ import {
   ParentScheduleData,
   ParentScheduleEntry,
 } from '../types';
-import { ScheduleEntry } from '../pages/Tables/ScheduleTable';
 
 const api = axios.create({
   baseURL: `${import.meta.env.VITE_BACKEND_URL}/api`,
@@ -45,6 +44,13 @@ export const authApi = {
     });
     return response.data;
   },
+
+  deleteUser: async (userId: string) => {
+    const response = await api.post(`/auth/delete-user`, {
+      userId,
+    });
+    return response.data;
+  },
 };
 
 export const uploadApi = {
@@ -72,7 +78,7 @@ export const downloadApi = {
 export interface ScheduleData {
   month: string;
   year: string;
-  entries: ScheduleEntry[];
+  entries: ParentScheduleEntry[];
 }
 
 export const scheduleApi = {

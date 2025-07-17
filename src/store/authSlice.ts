@@ -1,16 +1,19 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { IUser } from '../types';
+import { Parent } from '../components/Sidebar';
 
 interface AuthState {
   user: IUser | null;
   isAuthenticated: boolean;
   loading: boolean;
+  parents: Parent[];
 }
 
 const initialState: AuthState = {
   user: null,
   isAuthenticated: false,
   loading: true,
+  parents: [],
 };
 
 const authSlice = createSlice({
@@ -29,6 +32,9 @@ const authSlice = createSlice({
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
+    },
+    setParents: (state, action: PayloadAction<Parent[]>) => {
+      state.parents = action.payload;
     },
   },
 });

@@ -354,7 +354,7 @@ const SignUp: React.FC = () => {
                 </div>
               </div>
 
-              <div className="mb-6">
+              {/* <div className="mb-6">
                 <label className="mb-2.5 block font-medium text-black dark:text-white">
                   役割
                 </label>
@@ -366,10 +366,10 @@ const SignUp: React.FC = () => {
                     onChange={handleChange}
                   >
                     <option value={UserRole.PARENT}>保護者</option>
-                    <option value={UserRole.COACH}>コーチ</option>
+                    <option value={UserRole.COACH}>管理者</option>
                   </select>
                 </div>
-              </div>
+              </div> */}
 
               <div className="mb-5">
                 <input

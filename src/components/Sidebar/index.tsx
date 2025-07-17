@@ -11,9 +11,11 @@ interface SidebarProps {
   setSidebarOpen: (arg: boolean) => void;
 }
 
-interface Parent {
+export interface Parent {
   _id: string;
   username: string;
+  email: string;
+  guardianName: string;
   avatar: string;
 }
 
@@ -247,18 +249,80 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         >
                           {' '}
                           <svg
+                            width="24"
+                            height="24"
                             viewBox="0 0 24 24"
                             fill="none"
-                            stroke="currentColor"
-                            strokeWidth={1.5}
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="h-6 w-6"
+                            xmlns="http://www.w3.org/2000/svg"
                           >
-                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                            <circle cx="9" cy="7" r="4" />
-                            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                            <rect
+                              x="3"
+                              y="4"
+                              width="18"
+                              height="18"
+                              rx="2"
+                              ry="2"
+                              fill="currentColor"
+                            />
+                            <line
+                              x1="16"
+                              y1="2"
+                              x2="16"
+                              y2="6"
+                              stroke="white"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                            />
+                            <line
+                              x1="8"
+                              y1="2"
+                              x2="8"
+                              y2="6"
+                              stroke="white"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                            />
+                            <line
+                              x1="3"
+                              y1="10"
+                              x2="21"
+                              y2="10"
+                              stroke="#24303f"
+                              stroke-width="2"
+                            />
+                            <circle cx="7" cy="13" r="0.8" fill="#24303f" />
+                            <circle cx="12" cy="13" r="0.8" fill="#24303f" />
+                            <circle cx="17" cy="13" r="0.8" fill="#24303f" />
+                            <circle cx="7" cy="17" r="0.8" fill="#24303f" />
+                            <circle cx="12" cy="17" r="0.8" fill="#24303f" />
+                            <circle cx="17" cy="17" r="0.8" fill="#24303f" />
+                            <g transform="translate(15, 15)">
+                              <circle cx="4" cy="4" r="4.5" fill="#24303f" />
+                              <circle
+                                cx="3"
+                                cy="2.5"
+                                r="1"
+                                fill="currentColor"
+                              />
+                              <path
+                                d="M1 7 C1 5.5 2 4.5 3 4.5 C4 4.5 5 5.5 5 7"
+                                stroke="currentColor"
+                                stroke-width="0.8"
+                                fill="none"
+                              />
+                              <circle
+                                cx="5"
+                                cy="3.5"
+                                r="1"
+                                fill="currentColor"
+                              />
+                              <path
+                                d="M3 8 C3 6.5 4 5.5 5 5.5 C6 5.5 7 6.5 7 8"
+                                stroke="currentColor"
+                                stroke-width="0.8"
+                                fill="none"
+                              />
+                            </g>
                           </svg>
                           ユーザー別
                           <svg
@@ -329,31 +393,20 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     }`}
                   >
                     <svg
-                      className="fill-current"
-                      width="18"
-                      height="18"
-                      viewBox="0 0 18 18"
+                      viewBox="0 0 24 24"
                       fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
+                      stroke="currentColor"
+                      strokeWidth={1.5}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="h-6 w-6"
                     >
-                      <path
-                        d="M10.9688 1.57495H7.03135C3.43135 1.57495 0.506348 4.41558 0.506348 7.90308C0.506348 11.3906 2.75635 13.8375 8.26885 16.3125C8.40635 16.3687 8.52635 16.3968 8.6745 16.3968C8.85635 16.3968 9.03885 16.3406 9.19385 16.2281C9.45635 16.0593 9.64885 15.75 9.64885 15.4125V14.2031H10.9688C14.5688 14.2031 17.4938 11.3625 17.4938 7.87495C17.4938 4.38745 14.5688 1.57495 10.9688 1.57495ZM10.9688 12.9937H9.3376C8.70635 12.9937 8.15635 13.5437 8.15635 14.175V15.2437C3.45635 13.0875 1.74385 11.1375 1.74385 7.9312C1.74385 5.14683 4.09385 2.8687 7.03135 2.8687H10.9688C13.9063 2.8687 16.2563 5.14683 16.2563 7.9312C16.2563 10.7156 13.9063 12.9937 10.9688 12.9937Z"
-                        fill=""
-                      />
-                      <path
-                        d="M5.42812 7.28442C5.0625 7.28442 4.78125 7.56567 4.78125 7.9313C4.78125 8.29692 5.0625 8.57817 5.42812 8.57817C5.79375 8.57817 6.075 8.29692 6.075 7.9313C6.075 7.56567 5.79375 7.28442 5.42812 7.28442Z"
-                        fill=""
-                      />
-                      <path
-                        d="M9.00015 7.28442C8.63452 7.28442 8.35327 7.56567 8.35327 7.9313C8.35327 8.29692 8.63452 8.57817 9.00015 8.57817C9.33765 8.57817 9.64702 8.29692 9.64702 7.9313C9.64702 7.56567 9.33765 7.28442 9.00015 7.28442Z"
-                        fill=""
-                      />
-                      <path
-                        d="M12.5719 7.28442C12.2063 7.28442 11.925 7.56567 11.925 7.9313C11.925 8.29692 12.2063 8.57817 12.5719 8.57817C12.9375 8.57817 13.2188 8.29692 13.2188 7.9313C13.2188 7.56567 12.9094 7.28442 12.5719 7.28442Z"
-                        fill=""
-                      />
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                      <circle cx="9" cy="7" r="4" />
+                      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                     </svg>
-                    User Manage
+                    ユーザー管理
                   </NavLink>
                 </li>
               </ul>

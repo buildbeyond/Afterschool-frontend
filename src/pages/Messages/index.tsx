@@ -211,7 +211,7 @@ const Messages: React.FC = () => {
             <div className="text-gray-6 flex h-full items-center justify-center">
               {user?.role === 'coach'
                 ? '左のリストから保護者を選択してください。'
-                : 'コーチが見つかりません。'}
+                : '管理者が見つかりません。'}
             </div>
           )}
         </div>

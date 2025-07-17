@@ -52,7 +52,7 @@ const DropdownUser = () => {
             {user.username}
           </span>
           <span className="block text-xs">
-            {user.role === UserRole.PARENT ? '保護者' : 'コーチ'}
+            {user.role === UserRole.PARENT ? '保護者' : '管理者'}
           </span>
         </span>
 
