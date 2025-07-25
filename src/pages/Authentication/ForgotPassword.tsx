@@ -7,11 +7,26 @@ const ForgotPassword = () => {
     email: '',
   });
   const [message, setMessage] = useState('');
+  const [isError, setIsError] = useState(false);
+
   const handleSubmit = async (ev) => {
     ev.preventDefault();
+    if (!formData.email) {
+      setMessage('Please enter email');
+      setIsError(true);
+      return;
+    }
     setMessage('');
-    const response = await authApi.forgotPassword(formData.email);
-    setMessage(response);
+    authApi
+      .forgotPassword(formData.email)
+      .then((response) => {
+        setMessage(response.message);
+        setIsError(false);
+      })
+      .catch((err) => {
+        setMessage(err.response.data.message);
+        setIsError(true);
+      });
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -203,7 +218,11 @@ const ForgotPassword = () => {
               </div>
 
               {message && (
-                <div className="mb-6 rounded-lg bg-green-600 p-4 text-center">
+                <div
+                  className={`mb-6 rounded-lg ${
+                    isError ? 'bg-red' : 'bg-green-600'
+                  } p-4 text-center`}
+                >
                   <span className="text-md font-medium text-white">
                     {message}
                   </span>

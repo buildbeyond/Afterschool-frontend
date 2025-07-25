@@ -10,6 +10,7 @@ const ResetPassword: React.FC = () => {
     confirmPassword: '',
   });
   const [message, setMessage] = useState('');
+  const [isError, setIsError] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -22,15 +23,26 @@ const ResetPassword: React.FC = () => {
     ev.preventDefault();
     if (!formData.password) {
       setMessage('Password cannot be empty');
+      setIsError(true);
       return;
     }
     if (formData.password !== formData.confirmPassword) {
       setMessage('Passwords must meet');
+      setIsError(true);
       return;
     }
     setMessage('');
-    const response = await authApi.resetPassword(formData.password, token);
-    setMessage(response);
+    authApi
+      .resetPassword(formData.password, token)
+      .then((response) => {
+        setMessage(response.message);
+        setIsError(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        setMessage(err.response.data.message);
+        setIsError(true);
+      });
   };
 
   return (
@@ -248,7 +260,11 @@ const ResetPassword: React.FC = () => {
               </div>
 
               {message && (
-                <div className="mb-6 rounded-lg bg-green-600 p-4 text-center">
+                <div
+                  className={`mb-6 rounded-lg ${
+                    isError ? 'bg-red' : 'bg-green-600'
+                  } p-4 text-center`}
+                >
                   <span className="text-md font-medium text-white">
                     {message}
                   </span>
