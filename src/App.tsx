@@ -15,6 +15,9 @@ import SignUp from './pages/Authentication/SignUp';
 import Unauthorized from './pages/Authentication/Unauthorized';
 import Profile from './pages/Profile';
 import ScheduleIndividual from './pages/Schedule/ScheduleIndividual';
+import ForgotPassword from './pages/Authentication/ForgotPassword';
+import ResetPassword from './pages/Authentication/ResetPassword';
+import Users from './pages/Users';
 
 function AppContent() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -74,6 +77,34 @@ function AppContent() {
           )
         }
       />
+      <Route
+        path="/auth/forgot-password"
+        element={
+          isAuthenticated ? (
+            <Navigate
+              to={
+                user?.role == 'parent' ? '/schedule/input' : '/schedule/stats'
+              }
+            />
+          ) : (
+            <ForgotPassword />
+          )
+        }
+      />
+      <Route
+        path="/auth/reset-password/:token"
+        element={
+          isAuthenticated ? (
+            <Navigate
+              to={
+                user?.role == 'parent' ? '/schedule/input' : '/schedule/stats'
+              }
+            />
+          ) : (
+            <ResetPassword />
+          )
+        }
+      />
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route
         index
@@ -95,6 +126,15 @@ function AppContent() {
           <ProtectedRoute allowedRoles={['parent']}>
             <PageTitle title="Schedule Input" />
             <ScheduleInput />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/users"
+        element={
+          <ProtectedRoute allowedRoles={['coach']}>
+            <PageTitle title="Users Manage" />
+            <Users />
           </ProtectedRoute>
         }
       />

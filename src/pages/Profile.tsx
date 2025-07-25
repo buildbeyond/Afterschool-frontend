@@ -135,7 +135,7 @@ const Profile = () => {
               </h3>
             </div>
             <p className="font-medium">
-              {user.role === UserRole.PARENT ? '保護者' : 'コーチ'}
+              {user.role === UserRole.PARENT ? '保護者' : '管理者'}
             </p>
             <div className="mx-auto mb-5.5 mt-4.5 grid max-w-94 grid-cols-1 rounded-md border border-stroke py-2.5 shadow-1 dark:border-strokedark dark:bg-[#37404F]">
               <div className="flex flex-col items-center justify-center gap-1 border-r border-stroke px-4 dark:border-strokedark xsm:flex-row">
@@ -164,7 +164,7 @@ const Profile = () => {
             {/* New Fields for Coaches */}
             {user.role === UserRole.PARENT && (
               <div className="w-md mx-auto mt-4">
-                <h4 className="text-lg font-semibold">コーチ情報</h4>
+                <h4 className="text-lg font-semibold">管理者情報</h4>
                 <div className="flex flex-col justify-evenly gap-3 md:flex-row">
                   <div className="mb-4 w-60">
                     <label className="block text-sm font-medium">

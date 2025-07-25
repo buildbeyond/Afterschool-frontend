@@ -11,9 +11,11 @@ interface SidebarProps {
   setSidebarOpen: (arg: boolean) => void;
 }
 
-interface Parent {
+export interface Parent {
   _id: string;
   username: string;
+  email: string;
+  guardianName: string;
   avatar: string;
 }
 
@@ -247,20 +249,82 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         >
                           {' '}
                           <svg
+                            width="24"
+                            height="24"
                             viewBox="0 0 24 24"
                             fill="none"
-                            stroke="currentColor"
-                            strokeWidth={1.5}
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="h-6 w-6"
+                            xmlns="http://www.w3.org/2000/svg"
                           >
-                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                            <circle cx="9" cy="7" r="4" />
-                            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                            <rect
+                              x="3"
+                              y="4"
+                              width="18"
+                              height="18"
+                              rx="2"
+                              ry="2"
+                              fill="currentColor"
+                            />
+                            <line
+                              x1="16"
+                              y1="2"
+                              x2="16"
+                              y2="6"
+                              stroke="white"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                            />
+                            <line
+                              x1="8"
+                              y1="2"
+                              x2="8"
+                              y2="6"
+                              stroke="white"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                            />
+                            <line
+                              x1="3"
+                              y1="10"
+                              x2="21"
+                              y2="10"
+                              stroke="#24303f"
+                              stroke-width="2"
+                            />
+                            <circle cx="7" cy="13" r="0.8" fill="#24303f" />
+                            <circle cx="12" cy="13" r="0.8" fill="#24303f" />
+                            <circle cx="17" cy="13" r="0.8" fill="#24303f" />
+                            <circle cx="7" cy="17" r="0.8" fill="#24303f" />
+                            <circle cx="12" cy="17" r="0.8" fill="#24303f" />
+                            <circle cx="17" cy="17" r="0.8" fill="#24303f" />
+                            <g transform="translate(15, 15)">
+                              <circle cx="4" cy="4" r="4.5" fill="#24303f" />
+                              <circle
+                                cx="3"
+                                cy="2.5"
+                                r="1"
+                                fill="currentColor"
+                              />
+                              <path
+                                d="M1 7 C1 5.5 2 4.5 3 4.5 C4 4.5 5 5.5 5 7"
+                                stroke="currentColor"
+                                stroke-width="0.8"
+                                fill="none"
+                              />
+                              <circle
+                                cx="5"
+                                cy="3.5"
+                                r="1"
+                                fill="currentColor"
+                              />
+                              <path
+                                d="M3 8 C3 6.5 4 5.5 5 5.5 C6 5.5 7 6.5 7 8"
+                                stroke="currentColor"
+                                stroke-width="0.8"
+                                fill="none"
+                              />
+                            </g>
                           </svg>
-                          Users
+                          ユーザー別
                           <svg
                             className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${
                               open && 'rotate-180'
@@ -318,6 +382,35 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               )}
               {/** <!-- Menu Item Schedule --> */}
             </ul>
+            {user?.role === 'coach' && (
+              <ul className="mb-6 flex flex-col gap-1.5">
+                {/* Messages - Available for all users */}
+                <li>
+                  <NavLink
+                    to="/users"
+                    className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                      pathname === '/users' && 'bg-graydark dark:bg-meta-4'
+                    }`}
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={1.5}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="h-6 w-6"
+                    >
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                      <circle cx="9" cy="7" r="4" />
+                      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                    ユーザー管理
+                  </NavLink>
+                </li>
+              </ul>
+            )}
             <ul className="mb-6 flex flex-col gap-1.5">
               {/* Messages - Available for all users */}
               <li>
