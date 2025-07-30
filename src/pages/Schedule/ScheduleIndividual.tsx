@@ -174,6 +174,7 @@ const ScheduleIndividual: React.FC = () => {
         console.error('Error loading schedule:', error);
         // If 404 or any other error, still show all days
         setScheduleData(allDays);
+        setCurrentUser(error.response.data.username);
 
         // Only show error for non-404 responses
         if (!error.response || error.response.status !== 404) {
