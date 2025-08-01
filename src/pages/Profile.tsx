@@ -88,6 +88,8 @@ const Profile = () => {
                 className="rounded-full"
                 src={user.avatar || UserDefault}
                 alt="プロフィール"
+                width={'100%'}
+                height={'100%'}
               />
               <label
                 htmlFor="profile"
