@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { authApi } from '../../services/api';
-import companyLogo from '../../images/logo/banner.jpg';
+import companyLogo from '../../images/logo/logo_big.png';
 
 const ResetPassword: React.FC = () => {
   const { token } = useParams();
@@ -54,7 +54,7 @@ const ResetPassword: React.FC = () => {
             <p className="2xl:px-20">パスワードをリセットしてください</p>
 
             <span className="mt-15 inline-block">
-              <img src={companyLogo} width="auto" height="auto" />
+              <img src={companyLogo} width="300" height="auto" />
             </span>
           </div>
         </div>

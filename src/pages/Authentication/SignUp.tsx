@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { UserRole } from '../../types';
-import companyLogo from '../../images/logo/banner.jpg';
+import companyLogo from '../../images/logo/logo_big.png';
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
@@ -91,13 +91,16 @@ const SignUp: React.FC = () => {
             </p>
 
             <span className="mt-15 inline-block">
-              <img src={companyLogo} width="auto" height="auto" />
+              <img src={companyLogo} width="300" height="auto" />
             </span>
           </div>
         </div>
 
         <div className="w-full border-stroke dark:border-strokedark xl:w-1/2 xl:border-l-2">
-          <div className="w-full p-4 sm:p-12.5 xl:p-17.5">
+          <div className="flex justify-end p-8 pb-0 md:hidden">
+            <img src={companyLogo} width="100" height="auto" />
+          </div>
+          <div className="w-full p-4 pb-8 sm:p-12.5 xl:p-17.5">
             <span className="mb-1.5 block font-medium">無料で登録する</span>
             <h2 className="mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2">
               サービスに登録する

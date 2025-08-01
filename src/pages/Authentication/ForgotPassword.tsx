@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { authApi } from '../../services/api';
-import companyLogo from '../../images/logo/banner.jpg';
+import companyLogo from '../../images/logo/logo_big.png';
 
 const ForgotPassword = () => {
   const [formData, setFormData] = useState({
@@ -51,13 +51,16 @@ const ForgotPassword = () => {
             </p>
 
             <span className="mt-15 inline-block">
-              <img src={companyLogo} width="auto" height="auto" />
+              <img src={companyLogo} width="300" height="auto" />
             </span>
           </div>
         </div>
 
         <div className="w-full border-stroke dark:border-strokedark xl:w-1/2 xl:border-l-2">
-          <div className="w-full p-4 sm:p-12.5 xl:p-17.5">
+          <div className="flex justify-end p-8 pb-0 md:hidden">
+            <img src={companyLogo} width="100" height="auto" />
+          </div>
+          <div className="w-full p-4 pb-8 sm:p-12.5 xl:p-17.5">
             <span className="mb-1.5 block font-medium">
               無料で登録できます。
             </span>

@@ -224,7 +224,7 @@ const ScheduleStats: React.FC = () => {
       <Breadcrumb pageName="スケジュール統計" />
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="p-4">
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-4 flex items-center justify-between gap-y-4 max-md:flex-col">
             <div className="flex items-center gap-2">
               <button
                 className="hover:bg-gray-100 rounded-lg border border-stroke p-2 dark:border-strokedark dark:hover:bg-meta-4"

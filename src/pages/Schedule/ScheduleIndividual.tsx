@@ -232,10 +232,10 @@ const ScheduleIndividual: React.FC = () => {
 
   return (
     <DefaultLayout>
-      <Breadcrumb pageName="スケジュール入力" />
+      <Breadcrumb pageName="個別スケジュール" />
 
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-        <div className="flex justify-between border-b border-stroke px-6.5 py-4 dark:border-strokedark">
+        <div className="flex justify-between gap-y-4 border-b border-stroke px-6.5 py-4 dark:border-strokedark max-md:flex-col">
           <div className="flex items-center gap-2">
             <button
               className="flex h-6 w-6 items-center justify-center rounded-full border border-slate-400 p-1 text-base text-slate-400"
@@ -254,7 +254,7 @@ const ScheduleIndividual: React.FC = () => {
                 />
               </svg>
             </button>
-            <div className="flex items-center gap-x-4">
+            <div className="flex items-center gap-x-4 max-xsm:flex-col max-xsm:gap-y-4">
               <DatePickerJp
                 selectedDate={selectedDate}
                 onDateChange={setSelectedDate}
@@ -265,7 +265,7 @@ const ScheduleIndividual: React.FC = () => {
               </h3>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 max-md:justify-around">
             {/** Submit button */}
             <button
               type="button"
