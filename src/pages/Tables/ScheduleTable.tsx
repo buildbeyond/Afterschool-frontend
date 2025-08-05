@@ -47,7 +47,7 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
   };
 
   return (
-    <div className="max-h-[calc(100vh-300px)] overflow-x-auto rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+    <div className="overflow-x-auto rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark md:max-h-[calc(100vh-300px)]">
       <table className="w-full min-w-[1000px] table-auto">
         <thead className="sticky top-0 z-10">
           <tr className="border-b border-stroke bg-gray-2 dark:border-strokedark dark:bg-meta-4">
