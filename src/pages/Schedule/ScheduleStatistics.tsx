@@ -278,7 +278,7 @@ const ScheduleStats: React.FC = () => {
             </div>
           </div>
 
-          <div className="max-h-[calc(100vh-300px)] overflow-x-auto pb-36">
+          <div className="overflow-x-auto pb-36 md:max-h-[calc(100vh-300px)]">
             {isLoading ? (
               <>
                 {' '}
