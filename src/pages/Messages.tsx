@@ -327,7 +327,7 @@ const Messages: React.FC = () => {
                           : ''
                       }`}
                     >
-                      <div className="relative mr-3.5 min-h-11 min-w-11 max-w-11">
+                      <div className="relative mr-3.5 h-11 min-w-11 max-w-11">
                         <img
                           src={parent.avatar || UserDefault}
                           alt="profile"
