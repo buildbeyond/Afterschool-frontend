@@ -236,7 +236,7 @@ const ScheduleIndividual: React.FC = () => {
 
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="flex justify-between gap-y-4 border-b border-stroke px-6.5 py-4 dark:border-strokedark max-md:flex-col">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-center gap-2">
             <button
               className="flex h-6 w-6 items-center justify-center rounded-full border border-slate-400 p-1 text-base text-slate-400"
               onClick={() => navigate('/schedule/stats')}
